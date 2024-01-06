@@ -43,7 +43,7 @@ const CreateQr = async (req, res, next) => {
     // user.Qr.push(qr._id);
     // await user.save();
 
-    return res.redirect(url);
+    return res.send(url);
   } catch (error) {
     return next(new AppErr(error.message, 500));
   }
