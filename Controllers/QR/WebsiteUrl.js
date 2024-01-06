@@ -8,29 +8,29 @@ const ScanModel = require("../../Modal/Scanqr");
 const CreateQr = async (req, res, next) => {
   try {
     //------------------Validation Error-------------------------//
-    let error = validationResult(req);
-    if (!error.isEmpty()) {
-      return next(new AppErr(err.errors[0].msg, 403));
-    }
+    // let error = validationResult(req);
+    // if (!error.isEmpty()) {
+    //   return next(new AppErr(err.errors[0].msg, 403));
+    // }
 
     //-----------------Finding user--------------------//
-    let user = await UserModel.findById(req.user);
-    if (!user) {
-      return next(new AppErr("User not found", 404));
-    }
-    req.body.UserId = req.user;
+    // let user = await UserModel.findById(req.user);
+    // if (!user) {
+    //   return next(new AppErr("User not found", 404));
+    // }
+    req.body.UserId = "alok";
 
-    let { QrImage, Url, UniqueId } = req.body;
+    // let { Url, UniqueId } = req.body;
 
     //--------------------Creating Qr------------------------//
-    let QrImg = GenerateQr(req.user, Url, UniqueId);
+    // let QrImg = GenerateQr(req.user, Url, UniqueId);
 
     //---http://localhost:3000/api/v1/GenerateQr/?Url=www.exapple.com?Id=req.user?UniqueId=UniqueId---//
 
     //-----------------Saving Qr---------------------//
     let qr = await WebsiteModel.create(req.body);
-    user.Qr.push(qr._id);
-    await user.save();
+    // user.Qr.push(qr._id);
+    // await user.save();
 
     return res.status(200).json({
       message: "success",

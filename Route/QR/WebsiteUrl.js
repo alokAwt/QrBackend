@@ -13,12 +13,12 @@ const { body } = require("express-validator");
 const Isblocked = require("../../Middleware/IsBlocked");
 const WebsiteRouter = express.Router();
 
-WebsiteRouter.route("/Websiteurl/Create").post(
-  body("QrImage").notEmpty().withMessage("QrImage is required"),
-  body("Url").notEmpty().withMessage("Website Url isrequired"),
-  IsLogin,
-  Isblocked,
-  Issubcription,
+WebsiteRouter.route("/Websiteurl/Create").get(
+  // body("QrImage").notEmpty().withMessage("QrImage is required"),
+  // body("Url").notEmpty().withMessage("Website Url isrequired"),
+  // IsLogin,
+  // Isblocked,
+  // Issubcription,
   CreateQr
 );
 
