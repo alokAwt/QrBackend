@@ -32,10 +32,7 @@ const CreateQr = async (req, res, next) => {
     // user.Qr.push(qr._id);
     // await user.save();
 
-    return res.status(200).json({
-      message: "success",
-      data: qr,
-    });
+    return res.redirect("https://emami-demo.vercel.app")
   } catch (error) {
     return next(new AppErr(error.message, 500));
   }
