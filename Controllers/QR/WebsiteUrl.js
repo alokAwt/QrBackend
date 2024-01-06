@@ -3,8 +3,6 @@ const AppErr = require("../../Global/AppErr");
 const UserModel = require("../../Modal/User");
 const WebsiteModel = require("../../Modal/QR/WebsiteUrl");
 const ScanModel = require("../../Modal/Scanqr");
-var shortUrl = require("node-url-shortener");
-
 const shortid = require("shortid");
 //------------------------------CreateQr------------------------------------//
 const CreateQr = async (req, res, next) => {
@@ -31,13 +29,6 @@ const CreateQr = async (req, res, next) => {
     //   return next(new AppErr("User not found", 404));
     // }
     // req.body.UserId = "alok";
-    shortUrl.short(
-      "https://qr-backend-ten.vercel.app/api/v1/Qr/Websiteurl/Create",
-      function (err, url) {
-        console.log(url);
-      }
-    );
-
     let url = req.query.url;
 
     // let { Url, UniqueId } = req.body;
@@ -52,7 +43,7 @@ const CreateQr = async (req, res, next) => {
     // user.Qr.push(qr._id);
     // await user.save();
 
-    return res.redirect(`https://${url}`);
+    return res.redirect(url);
   } catch (error) {
     return next(new AppErr(error.message, 500));
   }
