@@ -13,6 +13,7 @@ const AudioRouter = require("./Route/QR/Audio");
 const ImageRouter = require("./Route/QR/Image");
 const VideoRouter = require("./Route/QR/Video");
 const app = express();
+Db();
 require("dotenv").config();
 
 //-----------------MiddleWare-------------------------//
@@ -28,9 +29,8 @@ app.use("/api/v1/socialmedia", SocialMediaRouter);
 app.use("/api/v1/PlayStore", PlayStoreRouter);
 app.use("/api/v1/document", DocumentRouter);
 app.use("/api/v1/audioQr", AudioRouter);
-app.use("/api/v1/ImageQr",ImageRouter);
-app.use("/api/v1/ImageQr",VideoRouter);
-
+app.use("/api/v1/ImageQr", ImageRouter);
+app.use("/api/v1/ImageQr", VideoRouter);
 
 app.use(globalErrHandler);
 
@@ -38,7 +38,6 @@ app.use(globalErrHandler);
 const PORT = process.env.PORT || 3000;
 const Applisten = () => {
   //------------Database Call------------//
-  Db();
   app.listen(PORT, () => {
     console.log(`App is listening on ${PORT}`);
   });
