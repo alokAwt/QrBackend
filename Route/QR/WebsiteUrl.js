@@ -38,5 +38,4 @@ WebsiteRouter.route("/Websiteurl/DeleteQr/:id").delete(
 
 WebsiteRouter.route("/Websiteurl/update").put(IsLogin, Isblocked, UpdateQrData);
 
-
 module.exports = WebsiteRouter;

@@ -21,7 +21,13 @@ const CreateQr = async (req, res, next) => {
     req.body.UserId = req.user;
 
     let { QrImage, Url, UniqueId } = req.body;
-    //-----------------Creating Qr---------------------//
+
+    //--------------------Creating Qr------------------------//
+    let QrImg = GenerateQr(req.user, Url, UniqueId);
+
+    //---http://localhost:3000/api/v1/GenerateQr/?Url=www.exapple.com?Id=req.user?UniqueId=UniqueId---//
+
+    //-----------------Saving Qr---------------------//
     let qr = await WebsiteModel.create(req.body);
     user.Qr.push(qr._id);
     await user.save();

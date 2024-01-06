@@ -34,9 +34,11 @@ ScanRouter.route("/Audio/Scan").post(IsLogin, Isblocked, AudioScanQr);
 ScanRouter.route("/Image/Scan").post(IsLogin, Isblocked, ImageScanQr);
 
 //-------------------Video-------------------------------//
-ScanRouter.route("/Video/Scan").post(IsLogin, Isblocked,VideoScanQr);
+ScanRouter.route("/Video/Scan").post(IsLogin, Isblocked, VideoScanQr);
 
 //--------------------Map---------------------------------//
+
+//-----------------Analytices------------------------//
 
 ScanRouter.route("/Scan/getanalytices").post(
   IsLogin,
