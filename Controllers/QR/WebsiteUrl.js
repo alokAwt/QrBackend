@@ -3,10 +3,22 @@ const AppErr = require("../../Global/AppErr");
 const UserModel = require("../../Modal/User");
 const WebsiteModel = require("../../Modal/QR/WebsiteUrl");
 const ScanModel = require("../../Modal/Scanqr");
+var shortUrl = require("node-url-shortener");
 
+const shortid = require("shortid");
 //------------------------------CreateQr------------------------------------//
 const CreateQr = async (req, res, next) => {
   try {
+    const originalUrl =
+      "https://qr-backend-ten.vercel.app/api/v1/Qr/Websiteurl/Create";
+
+    // Generate a unique short ID
+    const shortId = shortid.generate();
+
+    // Construct the short URL
+    const shortUrl = `https://your-shortening-service.com/${shortId}`;
+
+    console.log(shortUrl);
     //------------------Validation Error-------------------------//
     // let error = validationResult(req);
     // if (!error.isEmpty()) {
@@ -18,7 +30,15 @@ const CreateQr = async (req, res, next) => {
     // if (!user) {
     //   return next(new AppErr("User not found", 404));
     // }
-    req.body.UserId = "alok";
+    // req.body.UserId = "alok";
+    shortUrl.short(
+      "https://qr-backend-ten.vercel.app/api/v1/Qr/Websiteurl/Create",
+      function (err, url) {
+        console.log(url);
+      }
+    );
+
+    let url = req.query.url;
 
     // let { Url, UniqueId } = req.body;
 
@@ -32,7 +52,7 @@ const CreateQr = async (req, res, next) => {
     // user.Qr.push(qr._id);
     // await user.save();
 
-    return res.redirect("https://emami-demo.vercel.app")
+    return res.redirect(`https://${url}`);
   } catch (error) {
     return next(new AppErr(error.message, 500));
   }

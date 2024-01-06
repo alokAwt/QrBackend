@@ -20,8 +20,10 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.0.0",
     "morgan": "^1.10.0",
+    "node-url-shortener": "^2.0.3",
     "nodemailer": "^6.9.7",
     "otp-generator": "^4.0.1",
-    "qrcode": "^1.5.3"
+    "qrcode": "^1.5.3",
+    "shortid": "^2.2.16"
   }
 }
