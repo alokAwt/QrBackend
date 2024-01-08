@@ -6,7 +6,8 @@ const ScanModel = require("../../Modal/Scanqr");
 //------------------------------CreateQr------------------------------------//
 const CreateQr = async (req, res, next) => {
   try {
-    res.redirect("https://www.geeksforgeeks.org/")
+    let url = req.query.urlid;
+    res.send(url);
   } catch (error) {
     return next(new AppErr(error.message, 500));
   }
