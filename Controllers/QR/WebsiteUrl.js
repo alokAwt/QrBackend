@@ -3,47 +3,10 @@ const AppErr = require("../../Global/AppErr");
 const UserModel = require("../../Modal/User");
 const WebsiteModel = require("../../Modal/QR/WebsiteUrl");
 const ScanModel = require("../../Modal/Scanqr");
-const shortid = require("shortid");
 //------------------------------CreateQr------------------------------------//
 const CreateQr = async (req, res, next) => {
   try {
-    const originalUrl =
-      "https://qr-backend-ten.vercel.app/api/v1/Qr/Websiteurl/Create";
-
-    // Generate a unique short ID
-    const shortId = shortid.generate();
-
-    // Construct the short URL
-    const shortUrl = `https://your-shortening-service.com/${shortId}`;
-
-    console.log(shortUrl);
-    //------------------Validation Error-------------------------//
-    // let error = validationResult(req);
-    // if (!error.isEmpty()) {
-    //   return next(new AppErr(err.errors[0].msg, 403));
-    // }
-
-    //-----------------Finding user--------------------//
-    // let user = await UserModel.findById(req.user);
-    // if (!user) {
-    //   return next(new AppErr("User not found", 404));
-    // }
-    // req.body.UserId = "alok";
-    let url = req.query.url;
-
-    // let { Url, UniqueId } = req.body;
-
-    //--------------------Creating Qr------------------------//
-    // let QrImg = GenerateQr(req.user, Url, UniqueId);
-
-    //---http://localhost:3000/api/v1/GenerateQr/?Url=www.exapple.com?Id=req.user?UniqueId=UniqueId---//
-
-    //-----------------Saving Qr---------------------//
-    let qr = await WebsiteModel.create(req.body);
-    // user.Qr.push(qr._id);
-    // await user.save();
-
-    return res.send(url);
+    res.redirect("https://www.geeksforgeeks.org/")
   } catch (error) {
     return next(new AppErr(error.message, 500));
   }
