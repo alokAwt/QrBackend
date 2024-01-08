@@ -12,7 +12,7 @@ const { ImageScanQr } = require("../Controllers/QR/Image");
 const { VideoScanQr } = require("../Controllers/QR/Video");
 
 //---------------------WebsiteUrl--------------------------//
-ScanRouter.route("/Scan").post(IsLogin, Isblocked, ScanQr);
+ScanRouter.route("/Scanqr/:type/:id").get(ScanQr);
 
 //---------------------Social Media------------------------//
 ScanRouter.route("/SocialMedia/Scan").post(

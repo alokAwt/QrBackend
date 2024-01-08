@@ -3,11 +3,46 @@ const AppErr = require("../../Global/AppErr");
 const UserModel = require("../../Modal/User");
 const WebsiteModel = require("../../Modal/QR/WebsiteUrl");
 const ScanModel = require("../../Modal/Scanqr");
+const GenerateQr = require("../../Global/GenerateQr");
 //------------------------------CreateQr------------------------------------//
 const CreateQr = async (req, res, next) => {
   try {
-    let url = req.query.urlid;
-    res.redirect("https://angadiworldtech.com/");
+    let error = validationResult(req);
+    if (!error.isEmpty()) {
+      return next(new AppErr(err.errors[0].msg, 403));
+    }
+
+    //---------Getting UserDetails-----------------//
+    let user = await UserModel.findById(req.user);
+    if (!user) {
+      return next(new AppErr("user Not found", 404));
+    }
+    req.body.UserId = user._id;
+
+    //---  Get Url from User
+    let { Url } = req.body;
+
+    //---  Generate Unique ID
+    const timestamp = new Date().getTime(); // Current timestamp
+    const randomPart = Math.floor(Math.random() * 10000); // Random number (adjust as needed)
+    let url = `https://qr-backend-ten.vercel.app/api/v1/Scan/Scanqr/Website/${timestamp}${randomPart}`;
+    req.body.UniqueId = `${timestamp}${randomPart}`;
+
+    //---  Create Qr based on that ID
+    let qr = GenerateQr(url);
+    qr.then(async (qr) => {
+      req.body.QrImage = qr;
+      //---  Save the Deatils
+      let Qr = await WebsiteModel.create(req.body);
+
+      //---  Send Reponse
+      return res.status(200).json({
+        status: "success",
+        data: Qr,
+      });
+    }).catch((err) => {
+      return next(new AppErr(err, 500));
+    });
   } catch (error) {
     return next(new AppErr(error.message, 500));
   }
@@ -23,30 +58,37 @@ const ScanQr = async (req, res, next) => {
       return next(new AppErr(err.errors[0].msg, 403));
     }
 
-    //------------------Finding Users---------------------------//
-    let user = await UserModel.findById(req.user);
-    if (!user) {
-      return next(new AppErr("user not found", 404));
-    }
-
-    //-----------------Finding Qr-----------------------------//
-    let qr = await WebsiteModel.findOne({
-      UniqueId: req.body.UniqueId,
-    });
+    //---   get req.query unique id along with type
+    let type = req.params.type;
+    let id = req.params.id;
+    //---   Fetch Qr details
+    let qr = await WebsiteModel.findOne({ UniqueId: id });
     if (!qr) {
-      return next("Url Not Found", 404);
+      return next(new AppErr("Qr details not found", 500));
     }
-    //-----------------Saving Scan-------------------------//
+    //---   decode data of user
     req.body.QrId = qr._id;
-    req.body.UserId = req.user;
-    let scan = await ScanModel.create(req.body);
-    qr.ScanId.push(scan._id);
-    await qr.save();
+    req.body.UserId = qr.UserId;
+    req.body.DeviceName = req.headers["user-agent"];
+    //---   Save the Data
 
-    return res.status(200).json({
-      message: "Success",
-      data: qr,
-    });
+    let scan = await ScanModel.create(req.body);
+
+    //---   Redirected to that website
+    res.redirect(qr.Url);
+
+    // let userdetails = req.headers["user-agent"];
+    // let ip =
+    //   req.headers["x-forwarded-for"] ||
+    //   req.headers["x-real-ip"] ||
+    //   req.connection.remoteAddress ||
+    //   req.socket.remoteAddress ||
+    //   req.connection.socket.remoteAddress;
+    // console.log(ip);
+    // let url = req.query.urlid;
+    // res.redirect("https://angadiworldtech.com/");
+
+    //-----------------Saving Scan-------------------------//
   } catch (error) {
     return next(new AppErr(error.message, 500));
   }

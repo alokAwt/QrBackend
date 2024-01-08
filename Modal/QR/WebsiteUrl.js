@@ -3,23 +3,20 @@ const WebsiteQrSchema = new mongoose.Schema(
   {
     UserId: {
       type: String,
-      // required: true,
-    },
-    ScanId: {
-      type: [],
+      required: true,
     },
     QrImage: {
       type: String,
-      // required: true,
+      required: true,
     },
     Url: {
       type: String,
-      // required: true,
+      required: true,
     },
     UniqueId: {
       type: Number,
-      // required: true,
-      // unique: true,
+      required: true,
+      unique: true,
     },
   },
   {

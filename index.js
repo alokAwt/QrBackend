@@ -23,7 +23,7 @@ app.use(morgan("dev"));
 
 //------------------Routes MiddleWare---------------------//
 app.use("/api/v1/Users", UserRouter);
-app.use("/api/v1/Scanqr", ScanRouter);
+app.use("/api/v1/Scan", ScanRouter);
 app.use("/api/v1/Qr", WebsiteRouter);
 app.use("/api/v1/socialmedia", SocialMediaRouter);
 app.use("/api/v1/PlayStore", PlayStoreRouter);
