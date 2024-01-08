@@ -7,7 +7,7 @@ const ScanModel = require("../../Modal/Scanqr");
 const CreateQr = async (req, res, next) => {
   try {
     let url = req.query.urlid;
-    res.send(url);
+    res.redirect("https://angadiworldtech.com/");
   } catch (error) {
     return next(new AppErr(error.message, 500));
   }
