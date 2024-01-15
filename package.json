@@ -11,7 +11,6 @@
   "license": "ISC",
   "dependencies": {
     "@loskir/styled-qr-code-node": "^1.5.1",
-    "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
@@ -23,7 +22,6 @@
     "morgan": "^1.10.0",
     "nanoid": "^5.0.4",
     "nodemailer": "^6.9.7",
-    "otp-generator": "^4.0.1",
-    "qrcode": "^1.5.3"
+    "otp-generator": "^4.0.1"
   }
 }

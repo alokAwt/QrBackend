@@ -3,7 +3,7 @@ const AppErr = require("../../Global/AppErr");
 const UserModel = require("../../Modal/User");
 const WebsiteModel = require("../../Modal/QR/WebsiteUrl");
 const ScanModel = require("../../Modal/Scanqr");
-const GenerateQr = require("../../Global/GenerateQr");
+// const GenerateQr = require("../../Global/GenerateQr");
 const GenerateCustomizeQr = require("../../Global/CustomixedQr");
 //------------------------------CreateQr------------------------------------//
 const CreateQr = async (req, res, next) => {
