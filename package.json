@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "@loskir/styled-qr-code-node": "^1.5.1",
+    "@ronnieacs/styled-qr-code-node": "^0.1.2",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
