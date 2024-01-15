@@ -24,7 +24,6 @@
     "nanoid": "^5.0.4",
     "nodemailer": "^6.9.7",
     "otp-generator": "^4.0.1",
-    "qrcode": "^1.5.3",
-    "shortid": "^2.2.16"
+    "qrcode": "^1.5.3"
   }
 }
