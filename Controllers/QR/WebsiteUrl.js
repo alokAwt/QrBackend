@@ -4,7 +4,7 @@ const UserModel = require("../../Modal/User");
 const WebsiteModel = require("../../Modal/QR/WebsiteUrl");
 const ScanModel = require("../../Modal/Scanqr");
 // const GenerateQr = require("../../Global/GenerateQr");
-const GenerateCustomizeQr = require("../../Global/CustomixedQr");
+// const GenerateCustomizeQr = require("../../Global/CustomixedQr");
 //------------------------------CreateQr------------------------------------//
 const CreateQr = async (req, res, next) => {
   try {
@@ -38,14 +38,14 @@ const CreateQr = async (req, res, next) => {
 
     //---  Create Qr based on that ID
     // let qr = GenerateQr(url);
-    let qr = GenerateCustomizeQr(
-      url,
-      dotoption,
-      backgroundOption,
-      cornersOptions,
-      cornersDotOptions,
-      image
-    );
+    // let qr = GenerateCustomizeQr(
+    //   url,
+    //   dotoption,
+    //   backgroundOption,
+    //   cornersOptions,
+    //   cornersDotOptions,
+    //   image
+    // );
     qr.then(async (qr) => {
       req.body.QrImage = qr;
       //---  Save the Deatils
