@@ -6,7 +6,6 @@ const {
   GetSingleQr,
   DeleteQr,
   UpdateQrData,
-  getAnalytics,
 } = require("../../Controllers/QR/WebsiteUrl");
 const Issubcription = require("../../Middleware/IsSubcriptionTaken");
 const { body } = require("express-validator");

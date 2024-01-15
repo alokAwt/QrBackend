@@ -5,9 +5,6 @@ const DocumentQrSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    ScanId: {
-      type: [],
-    },
     QrImage: {
       type: String,
       required: true,

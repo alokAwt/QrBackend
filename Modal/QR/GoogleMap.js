@@ -6,9 +6,6 @@ const GoogleMapSchama = new mongoose.Schema(
       type: String,
       required: true,
     },
-    ScanId: {
-      type: [],
-    },
     QrImage: {
       type: String,
       required: true,
@@ -22,6 +19,10 @@ const GoogleMapSchama = new mongoose.Schema(
         type: String,
         required: true,
       },
+    },
+    Url: {
+      type: String,
+      required: true,
     },
     UniqueId: {
       type: Number,

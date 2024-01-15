@@ -4,6 +4,7 @@ const UserModel = require("../../Modal/User");
 const WebsiteModel = require("../../Modal/QR/WebsiteUrl");
 const ScanModel = require("../../Modal/Scanqr");
 const GenerateQr = require("../../Global/GenerateQr");
+const GenerateCustomizeQr = require("../../Global/CustomixedQr");
 //------------------------------CreateQr------------------------------------//
 const CreateQr = async (req, res, next) => {
   try {
@@ -20,7 +21,14 @@ const CreateQr = async (req, res, next) => {
     req.body.UserId = user._id;
 
     //---  Get Url from User
-    let { Url } = req.body;
+    let {
+      Url,
+      dotoption,
+      backgroundOption,
+      cornersOptions,
+      cornersDotOptions,
+      image,
+    } = req.body;
 
     //---  Generate Unique ID
     const timestamp = new Date().getTime(); // Current timestamp
@@ -29,16 +37,28 @@ const CreateQr = async (req, res, next) => {
     req.body.UniqueId = `${timestamp}${randomPart}`;
 
     //---  Create Qr based on that ID
-    let qr = GenerateQr(url);
+    // let qr = GenerateQr(url);
+    let qr = GenerateCustomizeQr(
+      url,
+      dotoption,
+      backgroundOption,
+      cornersOptions,
+      cornersDotOptions,
+      image
+    );
     qr.then(async (qr) => {
       req.body.QrImage = qr;
       //---  Save the Deatils
-      let Qr = await WebsiteModel.create(req.body);
+      let NewQr = await WebsiteModel.create(req.body);
+
+      //---Push in User Account-----//
+      user.Qr.push(NewQr._id);
+      await user.save();
 
       //---  Send Reponse
       return res.status(200).json({
         status: "success",
-        data: Qr,
+        data: NewQr,
       });
     }).catch((err) => {
       return next(new AppErr(err, 500));
@@ -76,17 +96,6 @@ const ScanQr = async (req, res, next) => {
 
     //---   Redirected to that website
     res.redirect(qr.Url);
-
-    // let userdetails = req.headers["user-agent"];
-    // let ip =
-    //   req.headers["x-forwarded-for"] ||
-    //   req.headers["x-real-ip"] ||
-    //   req.connection.remoteAddress ||
-    //   req.socket.remoteAddress ||
-    //   req.connection.socket.remoteAddress;
-    // console.log(ip);
-    // let url = req.query.urlid;
-    // res.redirect("https://angadiworldtech.com/");
 
     //-----------------Saving Scan-------------------------//
   } catch (error) {

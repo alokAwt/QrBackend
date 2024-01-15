@@ -13,8 +13,7 @@ const Isblocked = require("../../Middleware/IsBlocked");
 const ImageRouter = express.Router();
 
 ImageRouter.route("/Image/Create").post(
-  body("QrImage").notEmpty().withMessage("QrImage is required"),
-  body("Url").notEmpty().withMessage("Website Url isrequired"),
+  body("Url").notEmpty().withMessage("Website Url is required"),
   IsLogin,
   Isblocked,
   Issubcription,

@@ -228,7 +228,7 @@ const ResetPassword = async (req, res, next) => {
     const user = await UserModel.findByIdAndUpdate(
       userFound._id,
       {
-        Password: hashedPassword,
+        Password: Password,
       },
       { new: true }
     );
@@ -340,12 +340,12 @@ const CreateAccountByAdwin = async (req, res, next) => {
     let { Name, ContactNumber, Email, Password } = req.body;
 
     //--------------------Check users--------------------------//
-    let userFound = await UserModel.find({ Email: Email });
-    let userFound1 = await UserModel.find({ ContactNumber: ContactNumber });
-    if (userFound.length > 0) {
+    let userFound = await UserModel.findOne({ Email: Email });
+    let userFound1 = await UserModel.findOne({ ContactNumber: ContactNumber });
+    if (userFound) {
       return next(new AppErr("Email Already in Use", 404));
     }
-    if (userFound1.length > 0) {
+    if (userFound1) {
       return next(new AppErr("ContactNumber Already in Use", 404));
     }
 

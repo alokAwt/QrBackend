@@ -5,13 +5,6 @@ const SocialMediaSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    ProductName: {
-      type: String,
-      required: true,
-    },
-    ScanId: {
-      type: [],
-    },
     QrImage: {
       type: String,
       required: true,

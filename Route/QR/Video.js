@@ -13,8 +13,7 @@ const Isblocked = require("../../Middleware/IsBlocked");
 const VideoRouter = express.Router();
 
 VideoRouter.route("/Video/Create").post(
-  body("QrImage").notEmpty().withMessage("QrImage is required"),
-  body("Url").notEmpty().withMessage("Website Url isrequired"),
+  body("Url").notEmpty().withMessage("Website Url is required"),
   IsLogin,
   Isblocked,
   Issubcription,

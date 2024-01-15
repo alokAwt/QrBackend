@@ -14,32 +14,6 @@ const { VideoScanQr } = require("../Controllers/QR/Video");
 //---------------------WebsiteUrl--------------------------//
 ScanRouter.route("/Scanqr/:type/:id").get(ScanQr);
 
-//---------------------Social Media------------------------//
-ScanRouter.route("/SocialMedia/Scan").post(
-  IsLogin,
-  Isblocked,
-  SocialMediaScanQr
-);
-
-//---------------------PlayStore--------------------------//
-ScanRouter.route("/PlayStore/Scan").post(IsLogin, Isblocked, PlayStoreScanQr);
-
-//----------------------Documents-------------------------//
-ScanRouter.route("/Document/Scan").post(IsLogin, Isblocked, DocumnetScanQr);
-
-//---------------------AUDIO-----------------------------//
-ScanRouter.route("/Audio/Scan").post(IsLogin, Isblocked, AudioScanQr);
-
-//---------------------Images-----------------------------//
-ScanRouter.route("/Image/Scan").post(IsLogin, Isblocked, ImageScanQr);
-
-//-------------------Video-------------------------------//
-ScanRouter.route("/Video/Scan").post(IsLogin, Isblocked, VideoScanQr);
-
-//--------------------Map---------------------------------//
-
-//-----------------Analytices------------------------//
-
 ScanRouter.route("/Scan/getanalytices").post(
   IsLogin,
   Isblocked,
