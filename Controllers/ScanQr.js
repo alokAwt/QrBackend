@@ -10,6 +10,7 @@ const DocumnetModel = require("../Modal/QR/Document");
 const AudioModel = require("../Modal/QR/Audio");
 const UserModel = require("../Modal/User");
 const ScanModel = require("../Modal/Scanqr");
+const axios = require("axios");
 
 const ScanQr = async (req, res, next) => {
   try {
