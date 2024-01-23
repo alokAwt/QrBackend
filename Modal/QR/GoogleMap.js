@@ -10,16 +10,16 @@ const GoogleMapSchama = new mongoose.Schema(
       type: String,
       required: true,
     },
-    Location: {
-      lat: {
-        type: String,
-        required: true,
-      },
-      lon: {
-        type: String,
-        required: true,
-      },
+
+    lat: {
+      type: String,
+      required: true,
     },
+    lon: {
+      type: String,
+      required: true,
+    },
+
     Url: {
       type: String,
       required: true,

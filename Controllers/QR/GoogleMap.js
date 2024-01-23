@@ -5,12 +5,13 @@ const WebsiteModel = require("../../Modal/QR/WebsiteUrl");
 const ScanModel = require("../../Modal/Scanqr");
 const GenerateQr = require("../../Global/GenerateQr");
 const GoogleMapModel = require("../../Modal/QR/GoogleMap");
+const GenerateCustomizeQr = require("../../Global/CustomixedQr");
 //------------------------------CreateQr------------------------------------//
 const CreateQr = async (req, res, next) => {
   try {
     let error = validationResult(req);
     if (!error.isEmpty()) {
-      return next(new AppErr(err.errors[0].msg, 403));
+      return next(new AppErr(error.errors[0].msg, 403));
     }
 
     //---------Getting UserDetails-----------------//
@@ -21,7 +22,15 @@ const CreateQr = async (req, res, next) => {
     req.body.UserId = user._id;
 
     //---  Get Url from User
-    let { lat, lon } = req.body;
+    let {
+      lat,
+      lon,
+      dotoption,
+      backgroundOption,
+      cornersOptions,
+      cornersDotOptions,
+      image,
+    } = req.body;
 
     //---  Generate Unique ID
     const timestamp = new Date().getTime(); // Current timestamp
@@ -30,7 +39,15 @@ const CreateQr = async (req, res, next) => {
     req.body.UniqueId = `${timestamp}${randomPart}`;
 
     //---  Create Qr based on that ID
-    let qr = GenerateQr(url);
+    // let qr = GenerateQr(url);
+    let qr = GenerateCustomizeQr(
+      url,
+      dotoption,
+      backgroundOption,
+      cornersOptions,
+      cornersDotOptions,
+      image
+    );
     qr.then(async (qr) => {
       req.body.QrImage = qr;
       req.body.Url = `https://www.google.com/maps?q=${lat},${lon}&z=17&hl=en`;
@@ -46,48 +63,13 @@ const CreateQr = async (req, res, next) => {
         status: "success",
         data: NewQr,
       });
-    }).catch((err) => {
-      return next(new AppErr(err, 500));
+    }).catch((error) => {
+      return next(new AppErr(error, 500));
     });
   } catch (error) {
-    return next(new AppErr(error.message, 500));
+    return next(new AppErr(error, 500));
   }
 };
-
-//---------------------Scan Data------------------------//
-
-// const ScanQr = async (req, res, next) => {
-//   try {
-//     //------------------Validation Error-------------------------//
-//     let error = validationResult(req);
-//     if (!error.isEmpty()) {
-//       return next(new AppErr(err.errors[0].msg, 403));
-//     }
-
-//     //---   get req.query unique id along with type
-//     let type = req.params.type;
-//     let id = req.params.id;
-//     //---   Fetch Qr details
-//     let qr = await WebsiteModel.findOne({ UniqueId: id });
-//     if (!qr) {
-//       return next(new AppErr("Qr details not found", 500));
-//     }
-//     //---   decode data of user
-//     req.body.QrId = qr._id;
-//     req.body.UserId = qr.UserId;
-//     req.body.DeviceName = req.headers["user-agent"];
-//     //---   Save the Data
-
-//     let scan = await ScanModel.create(req.body);
-
-//     //---   Redirected to that website
-//     res.redirect(qr.Url);
-
-//     //-----------------Saving Scan-------------------------//
-//   } catch (error) {
-//     return next(new AppErr(error.message, 500));
-//   }
-// };
 
 //------------------------GETALLQR--------------------------------//
 
@@ -96,7 +78,7 @@ const Getallqr = async (req, res) => {
     //------------------Validation Error-------------------------//
     let error = validationResult(req);
     if (!error.isEmpty()) {
-      return next(new AppErr(err.errors[0].msg, 403));
+      return next(new AppErr(error.errors[0].msg, 403));
     }
 
     let Qr = await GoogleMapModel.find({
@@ -119,7 +101,7 @@ const GetSingleQr = async (req, res, next) => {
     //------------------Validation Error-------------------------//
     let error = validationResult(req);
     if (!error.isEmpty()) {
-      return next(new AppErr(err.errors[0].msg, 403));
+      return next(new AppErr(error.errors[0].msg, 403));
     }
 
     let Qr = await GoogleMapModel.findOne({ _id: req.params.id });
@@ -142,9 +124,10 @@ const UpdateQrData = async (req, res, next) => {
     //------------------Validation Error-------------------------//
     let error = validationResult(req);
     if (!error.isEmpty()) {
-      return next(new AppErr(err.errors[0].msg, 403));
+      return next(new AppErr(error.errors[0].msg, 403));
     }
 
+    let { lat, lon } = req.body;
     //--------------Finding User-------------------------//
     let user = await UserModel.findById(req.user);
     if (!user) {
@@ -165,8 +148,8 @@ const UpdateQrData = async (req, res, next) => {
     let updatedata = await GoogleMapModel.findByIdAndUpdate(
       getQr,
       {
-        lat: req.body.lat,
-        lon: req.body.lon,
+        lat,
+        lon,
         Url: `https://www.google.com/maps?q=${lat},${lon}&z=17&hl=en`,
       },
       {
@@ -189,7 +172,7 @@ const DeleteQr = async (req, res, next) => {
     //------------------Validation Error-------------------------//
     let error = validationResult(req);
     if (!error.isEmpty()) {
-      return next(new AppErr(err.errors[0].msg, 403));
+      return next(new AppErr(error.errors[0].msg, 403));
     }
 
     //------------------------Finding User----------------------//

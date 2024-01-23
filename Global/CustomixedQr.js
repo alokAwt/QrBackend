@@ -1,10 +1,10 @@
-// const { QRCodeCanvas } = require("@loskir/styled-qr-code-node");
+const { QRCodeCanvas } = require("@loskir/styled-qr-code-node");
 
 const GenerateCustomizeQr = async (
   data,
   dotoption,
   backgroundOption,
-  cornersOptions,
+  cornersOptions, 
   cornersDotOptions,
   image
 ) => {

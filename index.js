@@ -13,7 +13,6 @@ const AudioRouter = require("./Route/QR/Audio");
 const ImageRouter = require("./Route/QR/Image");
 const VideoRouter = require("./Route/QR/Video");
 const GooglemapRouter = require("./Route/QR/GoogleMap");
-const  main  = require("./Global/CustomixedQr");
 const app = express();
 Db();
 require("dotenv").config();

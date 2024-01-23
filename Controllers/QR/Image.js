@@ -3,6 +3,7 @@ const AppErr = require("../../Global/AppErr");
 const UserModel = require("../../Modal/User");
 const ScanModel = require("../../Modal/Scanqr");
 const ImageModel = require("../../Modal/QR/Image");
+const GenerateCustomizeQr = require("../../Global/CustomixedQr");
 
 //------------------------------CreateQr------------------------------------//
 const CreateQr = async (req, res, next) => {
@@ -21,7 +22,14 @@ const CreateQr = async (req, res, next) => {
     req.body.UserId = user._id;
 
     //---  Get Url from User
-    let { Url } = req.body;
+    let {
+      Url,
+      dotoption,
+      backgroundOption,
+      cornersOptions,
+      cornersDotOptions,
+      image,
+    } = req.body;
 
     //---  Generate Unique ID
     const timestamp = new Date().getTime(); // Current timestamp
@@ -30,7 +38,15 @@ const CreateQr = async (req, res, next) => {
     req.body.UniqueId = `${timestamp}${randomPart}`;
 
     //---  Create Qr based on that ID
-    let qr = GenerateQr(url);
+    // let qr = GenerateQr(url);
+    let qr = GenerateCustomizeQr(
+      url,
+      dotoption,
+      backgroundOption,
+      cornersOptions,
+      cornersDotOptions,
+      image
+    );
     qr.then(async (qr) => {
       req.body.QrImage = qr;
       //---  Save the Deatils
@@ -53,45 +69,8 @@ const CreateQr = async (req, res, next) => {
   }
 };
 
-//---------------------Scan Data------------------------//
 
-// const ImageScanQr = async (req, res, next) => {
-//   try {
-//     //------------------Validation Error-------------------------//
-//     let error = validationResult(req);
-//     if (!error.isEmpty()) {
-//       return next(new AppErr(err.errors[0].msg, 403));
-//     }
 
-//     //------------------Finding Users---------------------------//
-//     let user = await UserModel.findById(req.user);
-//     if (!user) {
-//       return next(new AppErr("user not found", 404));
-//     }
-
-//     //-----------------Finding Qr-----------------------------//
-//     let qr = await ImageModel.findOne({
-//       UniqueId: req.body.UniqueId,
-//     });
-//     console.log("alok", qr);
-//     if (!qr) {
-//       return next("Url Not Found", 404);
-//     }
-//     //-----------------Saving Scan-------------------------//
-//     req.body.QrId = qr._id;
-//     req.body.UserId = req.user;
-//     let scan = await ScanModel.create(req.body);
-//     qr.ScanId.push(scan._id);
-//     await qr.save();
-
-//     return res.status(200).json({
-//       message: "Success",
-//       data: qr,
-//     });
-//   } catch (error) {
-//     return next(new AppErr(error.message, 500));
-//   }
-// };
 
 //------------------------GETALLQR--------------------------------//
 
@@ -217,10 +196,8 @@ const DeleteQr = async (req, res, next) => {
 
 module.exports = {
   CreateQr,
-  // ImageScanQr,
   Getallqr,
   GetSingleQr,
   DeleteQr,
   UpdateQrData,
-  // getAnalytics,
 };
