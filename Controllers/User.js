@@ -228,7 +228,7 @@ const ResetPassword = async (req, res, next) => {
     const user = await UserModel.findByIdAndUpdate(
       userFound._id,
       {
-        Password: Password,
+        Password: hashedPassword,
       },
       { new: true }
     );

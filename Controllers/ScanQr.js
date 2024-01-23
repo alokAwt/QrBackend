@@ -87,10 +87,33 @@ const ScanQr = async (req, res, next) => {
       }
     }
 
+    const userIp = req.headers["user-agent"];
+    const ipv6Address =
+      req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+    const browserRegex = /(Chrome|Safari|Firefox|Edge|IE|Opera)\/(\S+)/i;
+    const osRegex =
+      /(Windows NT|Windows|Macintosh|Linux|Android|iOS|iPad|iPhone) (\S+)/i;
+    const browserMatch = userIp.match(browserRegex);
+    const osMatch = userIp.match(osRegex);
+    const browser = browserMatch ? browserMatch[1] : "Unknown Browser";
+    const operatingSystem = osMatch ? `${osMatch[1]}` : "Unknown OS";
+
+    const response = await axios.get(
+      `https://api.ip2location.io/?key=FF1FAF0872E080F0547180EE1A5796B2&ip=${ipv6Address}`
+    );
+    const data = response.data;
+    console.log(data);
+
     //---   decode data of user
     req.body.QrId = qr._id;
     req.body.UserId = qr.UserId;
-    req.body.DeviceName = req.headers["user-agent"];
+    req.body.DeviceName = browser;
+    req.body.Os = operatingSystem;
+    req.body.Lat = data.latitude;
+    req.body.Lon = data.longitude;
+    req.body.Country = data.country_name;
+    req.body.region = data.region_name;
+    req.body.city = data.city_name;
 
     //---   Save the Data
     let scan = await ScanModel.create(req.body);

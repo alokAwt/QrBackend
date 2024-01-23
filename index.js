@@ -13,6 +13,8 @@ const AudioRouter = require("./Route/QR/Audio");
 const ImageRouter = require("./Route/QR/Image");
 const VideoRouter = require("./Route/QR/Video");
 const GooglemapRouter = require("./Route/QR/GoogleMap");
+const SuscriptionRouter = require("./Route/Subscription");
+const requestIp = require('request-ip');
 const app = express();
 Db();
 require("dotenv").config();
@@ -21,6 +23,7 @@ require("dotenv").config();
 app.use(express.json());
 app.use(cors());
 app.use(morgan("dev"));
+app.use(requestIp.mw());
 
 //------------------Routes MiddleWare---------------------//
 app.use("/api/v1/Users", UserRouter);
@@ -33,6 +36,7 @@ app.use("/api/v1/audioQr", AudioRouter);
 app.use("/api/v1/ImageQr", ImageRouter);
 app.use("/api/v1/VideoQr", VideoRouter);
 app.use("/api/v1/Map", GooglemapRouter);
+app.use("/api/v1/Suscription",SuscriptionRouter)
 
 app.use(globalErrHandler);
 

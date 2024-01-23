@@ -29,11 +29,15 @@ const ScanQrschema = new mongoose.Schema(
       type: String,
       default: null,
     },
-    cityCode: {
+    Country: {
       type: String,
       default: null,
     },
-    state: {
+    region: {
+      type: String,
+      default: null,
+    },
+    city: {
       type: String,
       default: null,
     },

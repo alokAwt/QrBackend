@@ -19,10 +19,12 @@ const UserSchema = new mongoose.Schema(
       type: String,
       requried: true,
     },
-    subscription: {
-      type: Boolean,
-      default: false,
-    },
+    subscription: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Subscription",
+      },
+    ],
     Qr: [],
     isUser: {
       type: Boolean,

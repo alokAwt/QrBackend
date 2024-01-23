@@ -12,8 +12,10 @@
   "license": "ISC",
   "dependencies": {
     "@loskir/styled-qr-code-node": "^1.5.1",
+    "axios": "^1.6.5",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
+    "crypto": "^1.0.1",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "express-validator": "^7.0.1",
@@ -23,6 +25,8 @@
     "morgan": "^1.10.0",
     "nanoid": "^5.0.4",
     "nodemailer": "^6.9.7",
-    "otp-generator": "^4.0.1"
+    "otp-generator": "^4.0.1",
+    "razorpay": "^2.9.2",
+    "request-ip": "^3.3.0"
   }
 }
