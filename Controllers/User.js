@@ -1,7 +1,7 @@
 const { validationResult } = require("express-validator");
 const AppErr = require("../Global/AppErr");
 const UserModel = require("../Modal/User");
-const bcrypt = require("bcrypt");
+// const bcrypt = require("bcrypt");
 const GenerateToken = require("../Global/GenerateToken");
 const otpGenerator = require("otp-generator");
 const SendEmail = require("../Global/SendOtp");
@@ -29,9 +29,9 @@ const SignUpuserCtrl = async (req, res, next) => {
     }
 
     //-------------------Hash a Password-----------------------//
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(Password, salt);
-    req.body.Password = hashedPassword;
+    // const salt = await bcrypt.genSalt(10);
+    // const hashedPassword = await bcrypt.hash(Password, salt);
+    // req.body.Password = hashedPassword;
 
     //-------------------Assigning Role-----------------------//
     req.body.isUser = true;
@@ -70,10 +70,10 @@ const SigninCtrl = async (req, res, next) => {
     }
 
     //-------------------Checking Password---------------------//
-    const isPasswordMatch = await bcrypt.compare(Password, userFound.Password);
-    if (!isPasswordMatch) {
-      return next(new AppErr("Invalid Login Credentials / password", 404));
-    }
+    // const isPasswordMatch = await bcrypt.compare(Password, userFound.Password);
+    // if (!isPasswordMatch) {
+    //   return next(new AppErr("Invalid Login Credentials / password", 404));
+    // }
 
     //-----------------Generate Token----------------------//
     let Token = GenerateToken(userFound._id);
@@ -111,9 +111,9 @@ const SignUpAdwinCtrl = async (req, res, next) => {
     }
 
     //-------------------Hash a Password-----------------------//
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(Password, salt);
-    req.body.Password = hashedPassword;
+    // const salt = await bcrypt.genSalt(10);
+    // const hashedPassword = await bcrypt.hash(Password, salt);
+    // req.body.Password = hashedPassword;
 
     //-------------------Assigning Role-----------------------//
     req.body.isAdwin = true;
@@ -147,10 +147,10 @@ const SigninAdwinCtrl = async (req, res, next) => {
     }
 
     //-------------------Checking Password---------------------//
-    const isPasswordMatch = await bcrypt.compare(Password, userFound.Password);
-    if (!isPasswordMatch) {
-      return next(new AppErr("Invalid Login Credentials / password", 404));
-    }
+    // const isPasswordMatch = await bcrypt.compare(Password, userFound.Password);
+    // if (!isPasswordMatch) {
+    //   return next(new AppErr("Invalid Login Credentials / password", 404));
+    // }
 
     //-----------------Generate Token----------------------//
     let Token = GenerateToken(userFound._id);
@@ -221,14 +221,14 @@ const ResetPassword = async (req, res, next) => {
     }
 
     // //--------------------Hasing Password-------------------------//
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(Password, salt);
+    // const salt = await bcrypt.genSalt(10);
+    // const hashedPassword = await bcrypt.hash(Password, salt);
 
     //------------------Update Password-------------------//
     const user = await UserModel.findByIdAndUpdate(
       userFound._id,
       {
-        Password: hashedPassword,
+        Password: Password,
       },
       { new: true }
     );
@@ -350,9 +350,9 @@ const CreateAccountByAdwin = async (req, res, next) => {
     }
 
     // //-------------------Hash a Password-----------------------//
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(Password, salt);
-    req.body.Password = hashedPassword;
+    // const salt = await bcrypt.genSalt(10);
+    // const hashedPassword = await bcrypt.hash(Password, salt);
+    // req.body.Password = hashedPassword;
 
     //-------------------Assigning Role-----------------------//
     req.body.isUser = true;
