@@ -9,6 +9,7 @@ const GoogleMapModel = require("../Modal/QR/GoogleMap");
 const DocumnetModel = require("../Modal/QR/Document");
 const AudioModel = require("../Modal/QR/Audio");
 const UserModel = require("../Modal/User");
+const ScanModel = require("../Modal/Scanqr");
 
 const ScanQr = async (req, res, next) => {
   try {
