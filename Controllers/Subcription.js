@@ -76,7 +76,7 @@ const PayAmount = async (req, res, next) => {
     }
 
     //----------Getting User Data------------------//
-    let { response } = req.body;
+    let { response, PlanType } = req.body;
     let body = response.razorpay_order_id + "|" + response.razorpay_payment_id;
 
     //-----------Validating Signatire-----------//
@@ -148,4 +148,9 @@ const getAllSubscriptionsByAdmin = async (req, res, next) => {
   }
 };
 
-module.exports = { CreateOrder, PayAmount, getAllSubscriptions,getAllSubscriptionsByAdmin };
+module.exports = {
+  CreateOrder,
+  PayAmount,
+  getAllSubscriptions,
+  getAllSubscriptionsByAdmin,
+};

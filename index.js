@@ -14,6 +14,7 @@ const ImageRouter = require("./Route/QR/Image");
 const VideoRouter = require("./Route/QR/Video");
 const GooglemapRouter = require("./Route/QR/GoogleMap");
 const SuscriptionRouter = require("./Route/Subscription");
+const SuscriptionPlanRouter = require("./Route/SubscriptionPlan");
 const requestIp = require('request-ip');
 const app = express();
 Db();
@@ -37,7 +38,7 @@ app.use("/api/v1/ImageQr", ImageRouter);
 app.use("/api/v1/VideoQr", VideoRouter);
 app.use("/api/v1/Map", GooglemapRouter);
 app.use("/api/v1/Suscription",SuscriptionRouter)
-
+app.use("/api/v1/Plan",SuscriptionPlanRouter);
 app.use(globalErrHandler);
 
 //----------------Server Listening--------------------------//

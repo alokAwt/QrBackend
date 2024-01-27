@@ -12,6 +12,8 @@ const {
   UpdateProfile,
   CreateAccountByAdwin,
   DeleteAccountbyAdwn,
+  UnblockUser,
+  getAllBlocked,
 } = require("../Controllers/User");
 const { body, param } = require("express-validator");
 const IsLogin = require("../Middleware/Islogin");
@@ -101,6 +103,19 @@ UserRouter.route("/deleteAccountByAdwin/:id").put(
   IsLogin,
   IsAdwin,
   DeleteAccountbyAdwn
+);
+
+UserRouter.route("/Unblock/:id").put(
+  param("id").notEmpty().withMessage("Params id is required"),
+  IsLogin,
+  IsAdwin,
+  UnblockUser
+);
+
+UserRouter.route("/blockUser").get(
+  IsLogin,
+  IsAdwin,
+  getAllBlocked
 );
 
 module.exports = UserRouter;

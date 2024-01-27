@@ -1,7 +1,7 @@
 const { validationResult } = require("express-validator");
 const AppErr = require("../Global/AppErr");
 const UserModel = require("../Modal/User");
-// const bcrypt = require("bcrypt");
+const bcrypt = require("bcrypt");
 const GenerateToken = require("../Global/GenerateToken");
 const otpGenerator = require("otp-generator");
 const SendEmail = require("../Global/SendOtp");
@@ -29,9 +29,9 @@ const SignUpuserCtrl = async (req, res, next) => {
     }
 
     //-------------------Hash a Password-----------------------//
-    // const salt = await bcrypt.genSalt(10);
-    // const hashedPassword = await bcrypt.hash(Password, salt);
-    // req.body.Password = hashedPassword;
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(Password, salt);
+    req.body.Password = hashedPassword;
 
     //-------------------Assigning Role-----------------------//
     req.body.isUser = true;
@@ -70,10 +70,10 @@ const SigninCtrl = async (req, res, next) => {
     }
 
     //-------------------Checking Password---------------------//
-    // const isPasswordMatch = await bcrypt.compare(Password, userFound.Password);
-    // if (!isPasswordMatch) {
-    //   return next(new AppErr("Invalid Login Credentials / password", 404));
-    // }
+    const isPasswordMatch = await bcrypt.compare(Password, userFound.Password);
+    if (!isPasswordMatch) {
+      return next(new AppErr("Invalid Login Credentials / password", 404));
+    }
 
     //-----------------Generate Token----------------------//
     let Token = GenerateToken(userFound._id);
@@ -111,9 +111,9 @@ const SignUpAdwinCtrl = async (req, res, next) => {
     }
 
     //-------------------Hash a Password-----------------------//
-    // const salt = await bcrypt.genSalt(10);
-    // const hashedPassword = await bcrypt.hash(Password, salt);
-    // req.body.Password = hashedPassword;
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(Password, salt);
+    req.body.Password = hashedPassword;
 
     //-------------------Assigning Role-----------------------//
     req.body.isAdwin = true;
@@ -147,10 +147,10 @@ const SigninAdwinCtrl = async (req, res, next) => {
     }
 
     //-------------------Checking Password---------------------//
-    // const isPasswordMatch = await bcrypt.compare(Password, userFound.Password);
-    // if (!isPasswordMatch) {
-    //   return next(new AppErr("Invalid Login Credentials / password", 404));
-    // }
+    const isPasswordMatch = await bcrypt.compare(Password, userFound.Password);
+    if (!isPasswordMatch) {
+      return next(new AppErr("Invalid Login Credentials / password", 404));
+    }
 
     //-----------------Generate Token----------------------//
     let Token = GenerateToken(userFound._id);
@@ -221,8 +221,8 @@ const ResetPassword = async (req, res, next) => {
     }
 
     // //--------------------Hasing Password-------------------------//
-    // const salt = await bcrypt.genSalt(10);
-    // const hashedPassword = await bcrypt.hash(Password, salt);
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(Password, salt);
 
     //------------------Update Password-------------------//
     const user = await UserModel.findByIdAndUpdate(
@@ -350,9 +350,9 @@ const CreateAccountByAdwin = async (req, res, next) => {
     }
 
     // //-------------------Hash a Password-----------------------//
-    // const salt = await bcrypt.genSalt(10);
-    // const hashedPassword = await bcrypt.hash(Password, salt);
-    // req.body.Password = hashedPassword;
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(Password, salt);
+    req.body.Password = hashedPassword;
 
     //-------------------Assigning Role-----------------------//
     req.body.isUser = true;
@@ -387,7 +387,64 @@ const DeleteAccountbyAdwn = async (req, res, next) => {
 
     return res.status(200).json({
       message: "success",
-      data: "user Deleted successfully",
+      data: "user Blocked",
+    });
+  } catch (error) {
+    return next(new AppErr(error.message, 500));
+  }
+};
+
+//-----------------------UnBlock User By Admin-----------------------------//
+
+const UnblockUser = async (req, res, next) => {
+  try {
+    let err = validationResult(req);
+    if (!err.isEmpty()) {
+      return next(new AppErr(err.errors[0].msg, 403));
+    }
+
+    //--------------Getting UserId---------------//
+    let user = await UserModel.findById(req.params.id);
+    if (!user) {
+      return next(new AppErr("User not found", 404));
+    }
+
+    //----------------Unblock User------------------//
+    let UserUpdate = await UserModel.findByIdAndUpdate(
+      user._id,
+      {
+        isDeleted: false,
+      },
+      {
+        new: true,
+      }
+    );
+
+    return res.status(200).json({
+      status: "success",
+      data: UserUpdate,
+    });
+  } catch (error) {
+    return next(new AppErr(error.message, 500));
+  }
+};
+
+//------------------GetAllBlockedUser--------------------//
+const getAllBlocked = async (req, res, next) => {
+  try {
+    let err = validationResult(req);
+    if (!err.isEmpty()) {
+      return next(new AppErr(err.errors[0].msg, 403));
+    }
+
+    //--------------Getting UserId---------------//
+    let user = await UserModel.find({
+      isDeleted: true
+    });
+
+    return res.status(200).json({
+      status: "success",
+      data: user,
     });
   } catch (error) {
     return next(new AppErr(error.message, 500));
@@ -406,4 +463,6 @@ module.exports = {
   UpdateProfile,
   CreateAccountByAdwin,
   DeleteAccountbyAdwn,
+  UnblockUser,
+  getAllBlocked
 };

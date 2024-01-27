@@ -21,49 +21,49 @@ const CreateQr = async (req, res, next) => {
     }
     req.body.UserId = user._id;
 
-   //---  Get Url from User
-   let {
-    Url,
-    dotoption,
-    backgroundOption,
-    cornersOptions,
-    cornersDotOptions,
-    image,
-  } = req.body;
+    //---  Get Url from User
+    let {
+      Url,
+      dotoption,
+      backgroundOption,
+      cornersOptions,
+      cornersDotOptions,
+      image,
+    } = req.body;
 
-  //---  Generate Unique ID
-  const timestamp = new Date().getTime(); // Current timestamp
-  const randomPart = Math.floor(Math.random() * 10000); // Random number (adjust as needed)
-  let url = `https://qr-backend-ten.vercel.app/api/v1/Scan/Scanqr/document/${timestamp}${randomPart}`;
-  req.body.UniqueId = `${timestamp}${randomPart}`;
+    //---  Generate Unique ID
+    const timestamp = new Date().getTime(); // Current timestamp
+    const randomPart = Math.floor(Math.random() * 10000); // Random number (adjust as needed)
+    let url = `https://qr-backend-ten.vercel.app/api/v1/Scan/Scanqr/document/${timestamp}${randomPart}`;
+    req.body.UniqueId = `${timestamp}${randomPart}`;
 
-  //---  Create Qr based on that ID
-  // let qr = GenerateQr(url);
-  let qr = GenerateCustomizeQr(
-    url,
-    dotoption,
-    backgroundOption,
-    cornersOptions,
-    cornersDotOptions,
-    image
-  );
-  qr.then(async (qr) => {
-    req.body.QrImage = qr;
-    //---  Save the Deatils
-    let NewQr = await DocumnetModel.create(req.body);
+    //---  Create Qr based on that ID
+    // let qr = GenerateQr(url);
+    let qr = GenerateCustomizeQr(
+      url,
+      dotoption,
+      backgroundOption,
+      cornersOptions,
+      cornersDotOptions,
+      image
+    );
+    qr.then(async (qr) => {
+      req.body.QrImage = qr;
+      //---  Save the Deatils
+      let NewQr = await DocumnetModel.create(req.body);
 
-    //---Push in User Account-----//
-    user.Qr.push(NewQr._id);
-    await user.save();
+      //---Push in User Account-----//
+      user.Qr.push(NewQr._id);
+      await user.save();
 
-    //---  Send Reponse
-    return res.status(200).json({
-      status: "success",
-      data: NewQr,
+      //---  Send Reponse
+      return res.status(200).json({
+        status: "success",
+        data: NewQr,
+      });
+    }).catch((err) => {
+      return next(new AppErr(err, 500));
     });
-  }).catch((err) => {
-    return next(new AppErr(err, 500));
-  });
   } catch (error) {
     return next(new AppErr(error.message, 500));
   }

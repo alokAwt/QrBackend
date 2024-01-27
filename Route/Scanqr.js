@@ -12,7 +12,7 @@ ScanRouter.route("/Scan/getanalytices").post(
   IsLogin,
   Isblocked,
   Issubcription,
- getAnalytics
+  getAnalytics
 );
 
 module.exports = ScanRouter;

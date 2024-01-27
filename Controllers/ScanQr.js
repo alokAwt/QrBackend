@@ -277,7 +277,7 @@ const getAnalytics = async (req, res, next) => {
 
     //---------------OS AND DEVICE---------------//
     result.forEach((item) => {
-      const os = item.os_family;
+      const os = item.Os;
 
       if (!OsData[os]) {
         OsData[os] = 0;
@@ -297,7 +297,7 @@ const getAnalytics = async (req, res, next) => {
 
     //------------Browser----------------//
     result.forEach((item) => {
-      const Browser = item.browser_family;
+      const Browser = item.DeviceName;
       if (!BrowserData[Browser]) {
         BrowserData[Browser] = 0;
       }
@@ -355,7 +355,7 @@ const getAnalytics = async (req, res, next) => {
       Browser: BrowserData,
       device: DeviceData,
       map: mapData,
-      citycode: citycode,
+      state: citycode,
     });
 
     return res.status(200).json({
