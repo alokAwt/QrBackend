@@ -18,6 +18,10 @@ const VideoQrSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    Qrtype: {
+      type: String,
+      default: "Video",
+    },
   },
   {
     timestamps: true,

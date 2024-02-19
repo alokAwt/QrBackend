@@ -18,6 +18,10 @@ const AudioQrSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    Qrtype: {
+      type: String,
+      default: "Audio",
+    },
   },
   {
     timestamps: true,

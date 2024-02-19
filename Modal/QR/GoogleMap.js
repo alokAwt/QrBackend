@@ -29,6 +29,10 @@ const GoogleMapSchama = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    Qrtype: {
+      type: String,
+      default: "GoogleMap",
+    },
   },
   {
     timestamps: true,

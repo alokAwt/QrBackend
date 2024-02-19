@@ -194,7 +194,6 @@ const DeleteQr = async (req, res, next) => {
 
 module.exports = {
   CreateQr,
- 
   Getallqr,
   GetSingleQr,
   DeleteQr,

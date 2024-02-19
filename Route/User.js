@@ -14,6 +14,12 @@ const {
   DeleteAccountbyAdwn,
   UnblockUser,
   getAllBlocked,
+  getAllUser,
+  GetAllQr,
+  TotalEarining,
+  AllQrdata,
+  UpdateProfilebyAdmin,
+  UpdateQrDataByadmin,
 } = require("../Controllers/User");
 const { body, param } = require("express-validator");
 const IsLogin = require("../Middleware/Islogin");
@@ -112,10 +118,24 @@ UserRouter.route("/Unblock/:id").put(
   UnblockUser
 );
 
-UserRouter.route("/blockUser").get(
+UserRouter.route("/blockUser").get(IsLogin, IsAdwin, getAllBlocked);
+
+UserRouter.route("/User").get(IsLogin, IsAdwin, getAllUser);
+
+UserRouter.route("/Dashboard").get(IsLogin, IsAdwin, GetAllQr);
+
+UserRouter.route("/Earning").get(IsLogin, IsAdwin, TotalEarining);
+UserRouter.route("/AllQrData").get(IsLogin, IsAdwin, AllQrdata);
+UserRouter.route("/UpdateUser/admin").put(
   IsLogin,
   IsAdwin,
-  getAllBlocked
+  UpdateProfilebyAdmin
 );
+UserRouter.route("/UpdateQr/admin").put(
+  IsLogin,
+  IsAdwin,
+  UpdateQrDataByadmin
+);
+
 
 module.exports = UserRouter;

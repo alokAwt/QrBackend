@@ -18,6 +18,10 @@ const ImageQrSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    Qrtype: {
+      type: String,
+      default: "Images",
+    },
   },
   {
     timestamps: true,

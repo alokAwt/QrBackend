@@ -4,9 +4,7 @@ const UserModel = require("../Modal/User");
 
 const Issubcription = async (req, res, next) => {
   try {
-    let user = await UserModel.findById(req.user).populate(
-      "subscription"
-    );
+    let user = await UserModel.findById(req.user).populate("subscription");
     console.log(user);
     if (!user) {
       return next(new AppErr("User Not found", 404));

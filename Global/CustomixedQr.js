@@ -4,41 +4,34 @@ const GenerateCustomizeQr = async (
   data,
   dotoption,
   backgroundOption,
-  cornersOptions, 
+  cornersOptions,
   cornersDotOptions,
   image
 ) => {
   const qrCode = new QRCodeCanvas({
+    width: 300,
+    height: 300,
+    type: "png",
     data: data,
-    cellSize: 6,
-    margin: 2,
-    color: "#000000",
-    background: "#ffffff",
-    ecl: "M",
-    dotsOptions: {
-      color: dotoption.color,
-      type: dotoption.type,
-    },
-    backgroundOptions: {
-      color: "#fff",
-      type: backgroundOption.type,
+    image: image?.image ,
+    margin: 10,
+    qrOptions: {
+      typeNumber: 0,
+      mode: "Byte",
+      errorCorrectionLevel: "Q",
     },
     imageOptions: {
       crossOrigin: "anonymous",
     },
-    cornersSquareOptions: {
-      color: cornersOptions.color,
-      type: cornersOptions.type,
+    dotsOptions: dotoption,
+    backgroundOptions: {
+      color: "rgba(255,255,255,1)",
     },
-    cornersDotOptionsHelper: {
-      color: cornersDotOptions.color,
-      type: cornersDotOptions.type,
-    },
-    image: image,
+    cornersDotOptions: cornersDotOptions,
+    cornersSquareOptions: cornersOptions,
   });
 
   try {
-    // Generate the QR code image as a data URL
     const dataUrl = await qrCode.toDataUrl();
     return dataUrl;
   } catch (error) {

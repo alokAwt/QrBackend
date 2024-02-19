@@ -25,7 +25,40 @@ const UserSchema = new mongoose.Schema(
         ref: "Subscription",
       },
     ],
-    Qr: [],
+    Qr: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Audio",
+      },
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Documnet",
+      },
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Map",
+      },
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Image",
+      },
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "PlayStore",
+      },
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "SocialMediaQr",
+      },
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Video",
+      },
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "websiteQr",
+      },
+    ],
     isUser: {
       type: Boolean,
       requried: true,
@@ -43,6 +76,7 @@ const UserSchema = new mongoose.Schema(
     },
   },
   {
+    strictPopulate: false,
     timestamps: true,
   }
 );

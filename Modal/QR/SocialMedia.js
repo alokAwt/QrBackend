@@ -18,6 +18,10 @@ const SocialMediaSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    Qrtype: {
+      type: String,
+      default: "Social",
+    },
   },
   {
     timestamps: true,

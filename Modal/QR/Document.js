@@ -18,6 +18,10 @@ const DocumentQrSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    Qrtype: {
+      type: String,
+      default: "Documents",
+    },
   },
   {
     timestamps: true,

@@ -5,6 +5,16 @@ const bcrypt = require("bcrypt");
 const GenerateToken = require("../Global/GenerateToken");
 const otpGenerator = require("otp-generator");
 const SendEmail = require("../Global/SendOtp");
+const WebsiteModel = require("../Modal/QR/WebsiteUrl");
+const AudioModel = require("../Modal/QR/Audio");
+const DocumnetModel = require("../Modal/QR/Document");
+const GoogleMapModel = require("../Modal/QR/GoogleMap");
+const ImageModel = require("../Modal/QR/Image");
+const SocialMediaModel = require("../Modal/QR/SocialMedia");
+const VideoModel = require("../Modal/QR/Video");
+const PlayStoreModel = require("../Modal/QR/PlayStore");
+const ScanModel = require("../Modal/Scanqr");
+const SubcriptionModel = require("../Modal/Subscription");
 
 //-----------------------SignUp User------------------------//
 
@@ -60,7 +70,7 @@ const SigninCtrl = async (req, res, next) => {
     let { Email, Password } = req.body;
     //-------------------Check Users--------------------------//
     let userFound = await UserModel.findOne({ Email: Email });
-    if (userFound.length > 0) {
+    if (!userFound) {
       return next(new AppErr("User not Found"), 404);
     }
 
@@ -178,10 +188,10 @@ const SendOtp = async (req, res, next) => {
     let { Email } = req.body;
 
     //-----------Checking Email--------------------------//
-    const userFound = await UserModel.findOne({ Email });
-    if (!userFound) {
-      return next(new AppErr("user not found", 404));
-    }
+    // const userFound = await UserModel.findOne({ Email });
+    // if (!userFound) {
+    //   return next(new AppErr("user not found", 404));
+    // }
 
     //--------Generate Otp-------------//
     let otp = otpGenerator.generate(4, {
@@ -267,10 +277,30 @@ const DeleteOwnAccount = async (req, res, next) => {
 //------------------------------Get Own Profile----------------------------//
 const getOwnProfile = async (req, res, next) => {
   try {
-    let user = await UserModel.findById(req.user);
-    if (!user) {
-      return next(new AppErr("user Not Found", 500));
-    }
+    let user = await UserModel.findById(req.user).lean();
+
+    let fetchPromises = [];
+    let qrModelNames = [
+      WebsiteModel,
+      PlayStoreModel,
+      AudioModel,
+      DocumnetModel,
+      VideoModel,
+      ImageModel,
+      SocialMediaModel,
+      GoogleMapModel,
+    ];
+    qrModelNames.forEach((modelName) => {
+      fetchPromises.push(
+        modelName
+          .find({ _id: { $in: user.Qr } })
+          .select("Url UniqueId Qrtype QrImage")
+          .lean()
+      );
+    });
+    let fetchedResults = await Promise.all(fetchPromises);
+    let combinedQrArray = fetchedResults.flatMap((result) => result);
+    user.Qr = combinedQrArray;
 
     return res.status(200).json({
       message: "status",
@@ -368,6 +398,37 @@ const CreateAccountByAdwin = async (req, res, next) => {
   }
 };
 
+//------------------Update Profile by admin-----------------------//
+const UpdateProfilebyAdmin = async (req, res, next) => {
+  try {
+    //--------------------Validation Checking------------------------------//
+    let err = validationResult(req);
+    if (!err.isEmpty()) {
+      return next(new AppErr(err.errors[0].msg, 403));
+    }
+
+    let { Name, Email, ContactNumber, id } = req.body;
+
+    //------------------Update Users--------------------------------//
+    let userUpdate = await UserModel.findByIdAndUpdate(
+      id,
+      {
+        Name: Name,
+        Email: Email,
+        ContactNumber: ContactNumber,
+      },
+      { new: true }
+    );
+
+    return res.status(200).json({
+      message: "success",
+      data: userUpdate,
+    });
+  } catch (error) {
+    return next(new AppErr(error.message, 500));
+  }
+};
+
 //-----------------------Block User by Adwin---------------------//
 
 const DeleteAccountbyAdwn = async (req, res, next) => {
@@ -439,12 +500,346 @@ const getAllBlocked = async (req, res, next) => {
 
     //--------------Getting UserId---------------//
     let user = await UserModel.find({
-      isDeleted: true
+      isDeleted: true,
     });
 
     return res.status(200).json({
       status: "success",
       data: user,
+    });
+  } catch (error) {
+    return next(new AppErr(error.message, 500));
+  }
+};
+
+//---------------Get All User---------------------------------//
+const getAllUser = async (req, res, next) => {
+  try {
+    let err = validationResult(req);
+    if (!err.isEmpty()) {
+      return next(new AppErr(err.errors[0].msg, 403));
+    }
+
+    //--------------Getting UserId---------------//
+    let user = await UserModel.find({
+      isDeleted: false,
+    });
+
+    return res.status(200).json({
+      status: "success",
+      data: user,
+    });
+  } catch (error) {
+    return next(new AppErr(error.message, 500));
+  }
+};
+
+//--------------------------Total qr code--------------------------//
+
+const GetAllQr = async (req, res, next) => {
+  try {
+    let err = validationResult(req);
+    if (!err.isEmpty()) {
+      return next(new AppErr(err.errors[0].msg, 403));
+    }
+
+    let website = await WebsiteModel.find().count();
+    let Audio = await AudioModel.find().count();
+    let Document = await DocumnetModel.find().count();
+    let map = await GoogleMapModel.find().count();
+    let images = await ImageModel.find().count();
+    let Social = await SocialMediaModel.find().count();
+    let Video = await VideoModel.find().count();
+    let play = await PlayStoreModel.find().count();
+
+    let AllScan = await ScanModel.find().count();
+    let AllQr =
+      website + Audio + Document + map + images + Video + play + Social;
+
+    return res.status(200).json({
+      status: "success",
+      Qr: AllQr,
+      Scan: AllScan,
+    });
+  } catch (error) {
+    return next(new AppErr(error.message, 500));
+  }
+};
+
+//-----------------------Total Earning-------------------------//
+const TotalEarining = async (req, res, next) => {
+  try {
+    let earn = await SubcriptionModel.find();
+    console.log(earn);
+    let price = 0;
+    for (let i = 0; i < earn.length; i++) {
+      price += earn[i].Price;
+    }
+    return res.status(200).json({
+      status: "success",
+      price: price,
+      sub: earn.length,
+    });
+  } catch (error) {
+    return next(new AppErr(error, 500));
+  }
+};
+
+//---------------------All Qr data----------------------------//
+
+const AllQrdata = async (req, res, next) => {
+  try {
+    let website = await WebsiteModel.find().select("-__v"); // Exclude _id and __v fields
+    let Audio = await AudioModel.find().select("-__v");
+    let Document = await DocumnetModel.find().select("-__v");
+    let map = await GoogleMapModel.find().select("-__v");
+    let images = await ImageModel.find().select("-__v");
+    let Social = await SocialMediaModel.find().select("-__v");
+    let Video = await VideoModel.find().select("-__v");
+    let play = await PlayStoreModel.find().select("-__v");
+
+    // Add a new field to each document
+    website = website.map((doc) => ({ ...doc.toObject(), type: "website" }));
+    Audio = Audio.map((doc) => ({ ...doc.toObject(), type: "Audio" }));
+    Document = Document.map((doc) => ({ ...doc.toObject(), type: "Document" }));
+    map = map.map((doc) => ({ ...doc.toObject(), type: "map" }));
+    images = images.map((doc) => ({ ...doc.toObject(), type: "images" }));
+    Social = Social.map((doc) => ({ ...doc.toObject(), type: "Social" }));
+    Video = Video.map((doc) => ({ ...doc.toObject(), type: "Video" }));
+    play = play.map((doc) => ({ ...doc.toObject(), type: "playstore" }));
+
+    let allData = []
+      .concat(website)
+      .concat(Audio)
+      .concat(Document)
+      .concat(map)
+      .concat(images)
+      .concat(Social)
+      .concat(Video)
+      .concat(play);
+
+    return res.status(200).json({
+      status: "success",
+      data: allData,
+    });
+  } catch (error) {
+    return next(new AppErr(error, 500));
+  }
+};
+
+//------------------------Update Url by Admin-----------------------//
+const UpdateQrDataByadmin = async (req, res, next) => {
+  try {
+    //------------------Validation Error-------------------------//
+    let error = validationResult(req);
+    if (!error.isEmpty()) {
+      return next(new AppErr(err.errors[0].msg, 403));
+    }
+
+    //--------------Finding User-------------------------//
+    let user = await UserModel.findById(req.body.id);
+    if (!user) {
+      return next(new AppErr("user not found", 404));
+    }
+
+    //--------------Finding Qr---------------------------//
+    var updatedata;
+    switch (req.body.type) {
+      case "website": {
+        let getQr = await WebsiteModel.findOne({ UniqueId: req.body.UniqueId });
+
+        if (!getQr) {
+          return next(new AppErr("Qr not found", 404));
+        }
+        if (user._id != getQr.UserId) {
+          return next(
+            new AppErr("You Dont't have access to edit this qr", 405)
+          );
+        }
+
+        updatedata = await WebsiteModel.findByIdAndUpdate(
+          getQr,
+          {
+            Url: req.body.Url,
+          },
+          {
+            new: true,
+          }
+        );
+
+        break;
+      }
+      case "Audio": {
+        let getQr = await AudioModel.findOne({ UniqueId: req.body.UniqueId });
+        if (!getQr) {
+          return next(new AppErr("Qr not found", 404));
+        }
+        if (user._id != getQr.UserId) {
+          return next(
+            new AppErr("You Dont't have access to edit this qr", 405)
+          );
+        }
+
+        updatedata = await AudioModel.findByIdAndUpdate(
+          getQr,
+          {
+            Url: req.body.Url,
+          },
+          {
+            new: true,
+          }
+        );
+        break;
+      }
+      case "Document": {
+        let getQr = await DocumnetModel.findOne({
+          UniqueId: req.body.UniqueId,
+        });
+        if (!getQr) {
+          return next(new AppErr("Qr not found", 404));
+        }
+        if (user._id != getQr.UserId) {
+          return next(
+            new AppErr("You Dont't have access to edit this qr", 405)
+          );
+        }
+
+        updatedata = await DocumnetModel.findByIdAndUpdate(
+          getQr,
+          {
+            Url: req.body.Url,
+          },
+          {
+            new: true,
+          }
+        );
+        break;
+      }
+
+      case "map": {
+        let getQr = await GoogleMapModel.findOne({
+          UniqueId: req.body.UniqueId,
+        });
+        if (!getQr) {
+          return next(new AppErr("Qr not found", 404));
+        }
+        if (user._id != getQr.UserId) {
+          return next(
+            new AppErr("You Dont't have access to edit this qr", 405)
+          );
+        }
+
+        updatedata = await GoogleMapModel.findByIdAndUpdate(
+          getQr,
+          {
+            Url: req.body.Url,
+          },
+          {
+            new: true,
+          }
+        );
+        break;
+      }
+      case "images": {
+        let getQr = await ImageModel.findOne({ UniqueId: req.body.UniqueId });
+        if (!getQr) {
+          return next(new AppErr("Qr not found", 404));
+        }
+        if (user._id != getQr.UserId) {
+          return next(
+            new AppErr("You Dont't have access to edit this qr", 405)
+          );
+        }
+
+        updatedata = await ImageModel.findByIdAndUpdate(
+          getQr,
+          {
+            Url: req.body.Url,
+          },
+          {
+            new: true,
+          }
+        );
+        break;
+      }
+
+      case "Social": {
+        let getQr = await SocialMediaModel.findOne({
+          UniqueId: req.body.UniqueId,
+        });
+        if (!getQr) {
+          return next(new AppErr("Qr not found", 404));
+        }
+        if (user._id != getQr.UserId) {
+          return next(
+            new AppErr("You Dont't have access to edit this qr", 405)
+          );
+        }
+
+        updatedata = await SocialMediaModel.findByIdAndUpdate(
+          getQr,
+          {
+            Url: req.body.Url,
+          },
+          {
+            new: true,
+          }
+        );
+        break;
+      }
+
+      case "Video": {
+        let getQr = await VideoModel.findOne({ UniqueId: req.body.UniqueId });
+        if (!getQr) {
+          return next(new AppErr("Qr not found", 404));
+        }
+        if (user._id != getQr.UserId) {
+          return next(
+            new AppErr("You Dont't have access to edit this qr", 405)
+          );
+        }
+
+        updatedata = await VideoModel.findByIdAndUpdate(
+          getQr,
+          {
+            Url: req.body.Url,
+          },
+          {
+            new: true,
+          }
+        );
+        break;
+      }
+
+      case "playstore": {
+        let getQr = await PlayStoreModel.findOne({
+          UniqueId: req.body.UniqueId,
+        });
+        if (!getQr) {
+          return next(new AppErr("Qr not found", 404));
+        }
+        if (user._id != getQr.UserId) {
+          return next(
+            new AppErr("You Dont't have access to edit this qr", 405)
+          );
+        }
+
+        updatedata = await PlayStoreModel.findByIdAndUpdate(
+          getQr,
+          {
+            Url: req.body.Url,
+          },
+          {
+            new: true,
+          }
+        );
+        break;
+      }
+    }
+
+    return res.status(200).json({
+      message: "success",
+      data: updatedata,
     });
   } catch (error) {
     return next(new AppErr(error.message, 500));
@@ -464,5 +859,11 @@ module.exports = {
   CreateAccountByAdwin,
   DeleteAccountbyAdwn,
   UnblockUser,
-  getAllBlocked
+  getAllBlocked,
+  getAllUser,
+  GetAllQr,
+  TotalEarining,
+  AllQrdata,
+  UpdateProfilebyAdmin,
+  UpdateQrDataByadmin,
 };

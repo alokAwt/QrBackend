@@ -7,7 +7,6 @@ const PlayStoreQrSchema = new mongoose.Schema(
     },
     QrImage: {
       type: String,
-      required: true,
     },
     Url: {
       type: String,
@@ -17,6 +16,10 @@ const PlayStoreQrSchema = new mongoose.Schema(
       type: Number,
       required: true,
       unique: true,
+    },
+    Qrtype: {
+      type: String,
+      default: "PlayStore",
     },
   },
   {
