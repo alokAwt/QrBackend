@@ -633,7 +633,7 @@ const UpdateQrDataByadmin = async (req, res, next) => {
     //------------------Validation Error-------------------------//
     let error = validationResult(req);
     if (!error.isEmpty()) {
-      return next(new AppErr(err.errors[0].msg, 403));
+      return next(new AppErr(error.errors[0].msg, 403));
     }
 
     //--------------Finding User-------------------------//

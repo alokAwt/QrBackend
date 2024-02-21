@@ -11,7 +11,7 @@ const CreateQr = async (req, res, next) => {
     //------------------Validation Error-------------------------//
     let error = validationResult(req);
     if (!error.isEmpty()) {
-      return next(new AppErr(err.errors[0].msg, 403));
+      return next(new AppErr(error.errors[0].msg, 403));
     }
 
     //---------Getting UserDetails-----------------//
@@ -77,7 +77,7 @@ const Getallqr = async (req, res) => {
     //------------------Validation Error-------------------------//
     let error = validationResult(req);
     if (!error.isEmpty()) {
-      return next(new AppErr(err.errors[0].msg, 403));
+      return next(new AppErr(error.errors[0].msg, 403));
     }
 
     let Qr = await PlayStoreModel.find({
@@ -100,7 +100,7 @@ const GetSingleQr = async (req, res, next) => {
     //------------------Validation Error-------------------------//
     let error = validationResult(req);
     if (!error.isEmpty()) {
-      return next(new AppErr(err.errors[0].msg, 403));
+      return next(new AppErr(error.errors[0].msg, 403));
     }
 
     let Qr = await PlayStoreModel.findOne({ _id: req.params.id });
@@ -123,7 +123,7 @@ const UpdateQrData = async (req, res, next) => {
     //------------------Validation Error-------------------------//
     let error = validationResult(req);
     if (!error.isEmpty()) {
-      return next(new AppErr(err.errors[0].msg, 403));
+      return next(new AppErr(error.errors[0].msg, 403));
     }
 
     //--------------Finding User-------------------------//
@@ -168,7 +168,7 @@ const DeleteQr = async (req, res, next) => {
     //------------------Validation Error-------------------------//
     let error = validationResult(req);
     if (!error.isEmpty()) {
-      return next(new AppErr(err.errors[0].msg, 403));
+      return next(new AppErr(error.errors[0].msg, 403));
     }
 
     //------------------------Finding User----------------------//

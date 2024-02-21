@@ -9,7 +9,7 @@ const Issubcription = async (req, res, next) => {
     if (!user) {
       return next(new AppErr("User Not found", 404));
     }
-    if (user.subscription) {
+    if (user.subscription.length > 0) {
       var Difference_In_Time =
         new Date().getTime() -
         new Date(user.subscription[0].lastDate).getTime();
