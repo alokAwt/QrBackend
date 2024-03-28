@@ -6,6 +6,7 @@ const {
   GetSingleQr,
   DeleteQr,
   UpdateQrData,
+  updateQrImgaes,
 } = require("../../Controllers/QR/PlayStore");
 const Issubcription = require("../../Middleware/IsSubcriptionTaken");
 const { body } = require("express-validator");
@@ -16,7 +17,7 @@ PlayStoreRouter.route("/PlayStore/Create").post(
   body("Url").notEmpty().withMessage("Website Url is required"),
   IsLogin,
   Isblocked,
-  Issubcription,
+  // Issubcription,
   CreateQr
 );
 
@@ -38,6 +39,12 @@ PlayStoreRouter.route("/PlayStore/update").put(
   IsLogin,
   Isblocked,
   UpdateQrData
+);
+
+PlayStoreRouter.route("/PlayStore/update/Images").put(
+  IsLogin,
+  Isblocked,
+ updateQrImgaes
 );
 
 module.exports = PlayStoreRouter;

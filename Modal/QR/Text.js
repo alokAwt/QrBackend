@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const DocumentQrSchema = new mongoose.Schema(
+const TextQrSchema = new mongoose.Schema(
   {
     UserId: {
       type: String,
@@ -24,7 +24,7 @@ const DocumentQrSchema = new mongoose.Schema(
     },
     Qrtype: {
       type: String,
-      default: "Documents",
+      default: "Text",
     },
     PublicId: {
       type: String,
@@ -35,5 +35,5 @@ const DocumentQrSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
-const DocumnetModel = mongoose.model("Documnet", DocumentQrSchema);
-module.exports = DocumnetModel;
+const TextModel = mongoose.model("Text", TextQrSchema);
+module.exports = TextModel;

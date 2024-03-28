@@ -30,6 +30,7 @@ const CreateQr = async (req, res, next) => {
       cornersOptions,
       cornersDotOptions,
       image,
+      QrName
     } = req.body;
 
     //---  Generate Unique ID
@@ -147,6 +148,7 @@ const UpdateQrData = async (req, res, next) => {
       getQr,
       {
         Url: req.body.Url,
+        QrName: req.body.qrName,
       },
       {
         new: true,
@@ -180,7 +182,10 @@ const DeleteQr = async (req, res, next) => {
       );
     }
     await PlayStoreModel.findByIdAndDelete(req.params.id);
-    user.Qr.pop(Qr._id);
+    const indexToRemove = user.Qr.findIndex((item) => item._id === Qr._id);
+    if (indexToRemove !== -1) {
+      user.Qr.splice(indexToRemove, 1);
+    }
     await user.save();
 
     return res.status(200).json({
@@ -192,12 +197,79 @@ const DeleteQr = async (req, res, next) => {
   }
 };
 
+
+const updateQrImgaes = async (req, res, next) => {
+  try {
+    let error = validationResult(req);
+    if (!error.isEmpty()) {
+      return next(new AppErr(error.errors[0].msg, 403));
+    }
+
+    //--------------Users------------------------------//
+    let user = await UserModel.findById(req.user);
+    if (!user) {
+      return next(new AppErr("User not found", 404));
+    }
+
+    //--------------Finding Qr---------------------------//
+    let getQr = await PlayStoreModel.findOne({ UniqueId: req.body.UniqueId });
+    if (!getQr) {
+      return next(new AppErr("Qr not found", 404));
+    }
+
+    //------------Checking----------------------//
+    if (user._id != getQr.UserId) {
+      return next(new AppErr("You Dont't have access to edit this qr", 405));
+    }
+
+    let {
+      dotoption,
+      backgroundOption,
+      cornersOptions,
+      cornersDotOptions,
+      image,
+    } = req.body;
+
+    const timestamp = new Date().getTime(); // Current timestamp
+    const randomPart = Math.floor(Math.random() * 10000); // Random number (adjust as needed)
+    let url = `https://qr-backend-ten.vercel.app/api/v1/Scan/Scanqr/Playstore/${timestamp}${randomPart}`;
+
+    let qr = GenerateCustomizeQr(
+      url,
+      dotoption,
+      backgroundOption,
+      cornersOptions,
+      cornersDotOptions,
+      image
+    );
+    qr.then(async (qr) => {
+      let newimages = await PlayStoreModel.findByIdAndUpdate(
+        getQr._id,
+        {
+          QrImage: qr,
+          UniqueId: `${timestamp}${randomPart}`,
+        },
+        { new: true }
+      );
+
+      return res.status(200).json({
+        status: "success",
+        data: newimages,
+      });
+    }).catch((err) => {
+      return next(new AppErr(err, 500));
+    });
+  } catch (error) {
+    return next(new AppErr(error.message, 500));
+  }
+};
+
+
 module.exports = {
   CreateQr,
-  // PlayStoreScanQr,
   Getallqr,
   GetSingleQr,
   DeleteQr,
   UpdateQrData,
-  // getAnalytics,
+  updateQrImgaes
 };

@@ -11,6 +11,7 @@ const AudioModel = require("../Modal/QR/Audio");
 const UserModel = require("../Modal/User");
 const ScanModel = require("../Modal/Scanqr");
 const axios = require("axios");
+const TextModel = require("../Modal/QR/Text");
 
 const ScanQr = async (req, res, next) => {
   try {
@@ -81,6 +82,14 @@ const ScanQr = async (req, res, next) => {
         if (!qr) {
           return next(new AppErr("Qr details not found", 500));
         }
+        break;
+      }
+      case "Text": {
+        let newqr = await TextModel.findOne({ UniqueId: id });
+        if (!qr) {
+          return next(new AppErr("Qr details not found", 500));
+        }
+        return res.send(newqr.Url);
         break;
       }
       default: {

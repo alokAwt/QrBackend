@@ -6,6 +6,7 @@ const {
   GetSingleQr,
   DeleteQr,
   UpdateQrData,
+  updateQrImgaes,
 } = require("../../Controllers/QR/Audio");
 const Issubcription = require("../../Middleware/IsSubcriptionTaken");
 const { body } = require("express-validator");
@@ -16,7 +17,7 @@ AudioRouter.route("/Audio/Create").post(
   body("Url").notEmpty().withMessage("Website Url is required"),
   IsLogin,
   Isblocked,
-  Issubcription,
+  // Issubcription,
   CreateQr
 );
 
@@ -27,5 +28,7 @@ AudioRouter.route("/Audio/getSingle/:id").get(IsLogin, Isblocked, GetSingleQr);
 AudioRouter.route("/Audio/DeleteQr/:id").delete(IsLogin, Isblocked, DeleteQr);
 
 AudioRouter.route("/Audio/update").put(IsLogin, Isblocked, UpdateQrData);
+
+AudioRouter.route("/Audio/update/Images").put(IsLogin, Isblocked, updateQrImgaes);
 
 module.exports = AudioRouter;

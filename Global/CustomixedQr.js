@@ -9,11 +9,11 @@ const GenerateCustomizeQr = async (
   image
 ) => {
   const qrCode = new QRCodeCanvas({
-    width: 300,
-    height: 300,
+    width: 250,
+    height: 250,
     type: "png",
     data: data,
-    image: image?.image ,
+    image: image.length > 0 ? image : undefined,
     margin: 10,
     qrOptions: {
       typeNumber: 0,

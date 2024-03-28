@@ -4,7 +4,7 @@ const UserModel = require("../../Modal/User");
 const AudioModel = require("../../Modal/QR/Audio");
 const ScanModel = require("../../Modal/Scanqr");
 const GenerateCustomizeQr = require("../../Global/CustomixedQr");
-
+const cloudinary = require("cloudinary").v2;
 //------------------------------CreateQr------------------------------------//
 const CreateQr = async (req, res, next) => {
   try {
@@ -29,12 +29,13 @@ const CreateQr = async (req, res, next) => {
       cornersOptions,
       cornersDotOptions,
       image,
+      QrName,
     } = req.body;
 
     //---  Generate Unique ID
     const timestamp = new Date().getTime(); // Current timestamp
     const randomPart = Math.floor(Math.random() * 10000); // Random number (adjust as needed)
-    let url = `https://qr-backend-ten.vercel.app/api/v1/Scan/Scanqr/Website/${timestamp}${randomPart}`;
+    let url = `https://qr-backend-ten.vercel.app/api/v1/Scan/Scanqr/Audio/${timestamp}${randomPart}`;
     req.body.UniqueId = `${timestamp}${randomPart}`;
 
     //---  Create Qr based on that ID
@@ -45,7 +46,8 @@ const CreateQr = async (req, res, next) => {
       backgroundOption,
       cornersOptions,
       cornersDotOptions,
-      image
+      image,
+      QrName
     );
     qr.then(async (qr) => {
       req.body.QrImage = qr;
@@ -68,7 +70,6 @@ const CreateQr = async (req, res, next) => {
     return next(new AppErr(error.message, 500));
   }
 };
-
 
 //------------------------GETALLQR--------------------------------//
 
@@ -121,6 +122,7 @@ const GetSingleQr = async (req, res, next) => {
 const UpdateQrData = async (req, res, next) => {
   try {
     //------------------Validation Error-------------------------//
+    console.log(req.body);
     let error = validationResult(req);
     if (!error.isEmpty()) {
       return next(new AppErr(error.errors[0].msg, 403));
@@ -143,10 +145,18 @@ const UpdateQrData = async (req, res, next) => {
       return next(new AppErr("You Dont't have access to edit this qr", 405));
     }
 
+    //-----------Delete previous data------------------------//
+    // const result = await cloudinary.uploader.destroy(getQr.PublicId);
+    // if (result.result === "not found") {
+    //   return next(new AppErr("Public Id Incorrect", 404));
+    // }
+
     let updatedata = await AudioModel.findByIdAndUpdate(
       getQr,
       {
         Url: req.body.Url,
+        QrName: req.body.qrName,
+        PublicId: req.body.PublicId,
       },
       {
         new: true,
@@ -179,13 +189,88 @@ const DeleteQr = async (req, res, next) => {
         new AppErr("You dont have permission to Delete this Qr", 404)
       );
     }
+
+    //-----------Delete previous data------------------------//
+    // const result = await cloudinary.uploader.destroy(Qr.PublicId);
+    // if (result.result === "not found") {
+    //   return next(new AppErr("Public Id Incorrect", 404));
+    // }
     await AudioModel.findByIdAndDelete(req.params.id);
-    user.Qr.pop(Qr._id);
+    const indexToRemove = user.Qr.findIndex((item) => item._id === Qr._id);
+    if (indexToRemove !== -1) {
+      user.Qr.splice(indexToRemove, 1);
+    }
     await user.save();
 
     return res.status(200).json({
       message: "Success",
       data: "Deleted successfully",
+    });
+  } catch (error) {
+    return next(new AppErr(error.message, 500));
+  }
+};
+
+const updateQrImgaes = async (req, res, next) => {
+  try {
+    let error = validationResult(req);
+    if (!error.isEmpty()) {
+      return next(new AppErr(error.errors[0].msg, 403));
+    }
+
+    //--------------Users------------------------------//
+    let user = await UserModel.findById(req.user);
+    if (!user) {
+      return next(new AppErr("User not found", 404));
+    }
+
+    //--------------Finding Qr---------------------------//
+    let getQr = await AudioModel.findOne({ UniqueId: req.body.UniqueId });
+    if (!getQr) {
+      return next(new AppErr("Qr not found", 404));
+    }
+
+    //------------Checking----------------------//
+    if (user._id != getQr.UserId) {
+      return next(new AppErr("You Dont't have access to edit this qr", 405));
+    }
+
+    let {
+      dotoption,
+      backgroundOption,
+      cornersOptions,
+      cornersDotOptions,
+      image,
+    } = req.body;
+
+    const timestamp = new Date().getTime(); // Current timestamp
+    const randomPart = Math.floor(Math.random() * 10000); // Random number (adjust as needed)
+    let url = `https://qr-backend-ten.vercel.app/api/v1/Scan/Scanqr/Audio/${timestamp}${randomPart}`;
+
+    let qr = GenerateCustomizeQr(
+      url,
+      dotoption,
+      backgroundOption,
+      cornersOptions,
+      cornersDotOptions,
+      image
+    );
+    qr.then(async (qr) => {
+      let newimages = await AudioModel.findByIdAndUpdate(
+        getQr._id,
+        {
+          QrImage: qr,
+          UniqueId: `${timestamp}${randomPart}`,
+        },
+        { new: true }
+      );
+
+      return res.status(200).json({
+        status: "success",
+        data: newimages,
+      });
+    }).catch((err) => {
+      return next(new AppErr(err, 500));
     });
   } catch (error) {
     return next(new AppErr(error.message, 500));
@@ -198,5 +283,5 @@ module.exports = {
   GetSingleQr,
   DeleteQr,
   UpdateQrData,
- 
+  updateQrImgaes,
 };

@@ -8,8 +8,6 @@ const UserSchema = new mongoose.Schema(
     },
     ContactNumber: {
       type: Number,
-      requried: true,
-      unique: true,
     },
     Email: {
       type: String,
@@ -17,8 +15,8 @@ const UserSchema = new mongoose.Schema(
     },
     Password: {
       type: String,
-      requried: true,
     },
+    Gamification: [],
     subscription: [
       {
         type: mongoose.Schema.Types.ObjectId,

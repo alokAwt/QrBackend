@@ -20,6 +20,8 @@ const {
   AllQrdata,
   UpdateProfilebyAdmin,
   UpdateQrDataByadmin,
+  UserCheck,
+  LoginWithGoogle,
 } = require("../Controllers/User");
 const { body, param } = require("express-validator");
 const IsLogin = require("../Middleware/Islogin");
@@ -131,11 +133,10 @@ UserRouter.route("/UpdateUser/admin").put(
   IsAdwin,
   UpdateProfilebyAdmin
 );
-UserRouter.route("/UpdateQr/admin").put(
-  IsLogin,
-  IsAdwin,
-  UpdateQrDataByadmin
-);
+UserRouter.route("/UpdateQr/admin").put(IsLogin, IsAdwin, UpdateQrDataByadmin);
 
+UserRouter.route("/CheckUser").post(UserCheck);
+
+UserRouter.route("/Login/Google").post(LoginWithGoogle);
 
 module.exports = UserRouter;

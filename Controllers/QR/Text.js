@@ -1,14 +1,15 @@
 const { validationResult } = require("express-validator");
 const AppErr = require("../../Global/AppErr");
 const UserModel = require("../../Modal/User");
-const WebsiteModel = require("../../Modal/QR/WebsiteUrl");
 const ScanModel = require("../../Modal/Scanqr");
-const GenerateQr = require("../../Global/GenerateQr");
-const GoogleMapModel = require("../../Modal/QR/GoogleMap");
 const GenerateCustomizeQr = require("../../Global/CustomixedQr");
+const TextModel = require("../../Modal/QR/Text");
+const cloudinary = require("cloudinary").v2;
+
 //------------------------------CreateQr------------------------------------//
 const CreateQr = async (req, res, next) => {
   try {
+    //------------------Validation Error-------------------------//
     let error = validationResult(req);
     if (!error.isEmpty()) {
       return next(new AppErr(error.errors[0].msg, 403));
@@ -23,20 +24,19 @@ const CreateQr = async (req, res, next) => {
 
     //---  Get Url from User
     let {
-      lat,
-      lon,
+      Url,
       dotoption,
       backgroundOption,
       cornersOptions,
       cornersDotOptions,
       image,
-      QrName
+      QrName,
     } = req.body;
 
     //---  Generate Unique ID
     const timestamp = new Date().getTime(); // Current timestamp
     const randomPart = Math.floor(Math.random() * 10000); // Random number (adjust as needed)
-    let url = `https://qr-backend-ten.vercel.app/api/v1/Scan/Scanqr/Map/${timestamp}${randomPart}`;
+    let url = `https://qrangadi.qrangadi.com/api/v1/Scan/Scanqr/Text/${timestamp}${randomPart}`;
     req.body.UniqueId = `${timestamp}${randomPart}`;
 
     //---  Create Qr based on that ID
@@ -47,14 +47,12 @@ const CreateQr = async (req, res, next) => {
       backgroundOption,
       cornersOptions,
       cornersDotOptions,
-      image,
-    
+      image
     );
     qr.then(async (qr) => {
       req.body.QrImage = qr;
-      req.body.Url = `https://www.google.com/maps?q=${lat},${lon}&z=17&hl=en`;
       //---  Save the Deatils
-      let NewQr = await GoogleMapModel.create(req.body);
+      let NewQr = await TextModel.create(req.body);
 
       //---Push in User Account-----//
       user.Qr.push(NewQr._id);
@@ -65,11 +63,11 @@ const CreateQr = async (req, res, next) => {
         status: "success",
         data: NewQr,
       });
-    }).catch((error) => {
-      return next(new AppErr(error, 500));
+    }).catch((err) => {
+      return next(new AppErr(err, 500));
     });
   } catch (error) {
-    return next(new AppErr(error, 500));
+    return next(new AppErr(error.message, 500));
   }
 };
 
@@ -83,7 +81,7 @@ const Getallqr = async (req, res) => {
       return next(new AppErr(error.errors[0].msg, 403));
     }
 
-    let Qr = await GoogleMapModel.find({
+    let Qr = await TextModel.find({
       UserId: req.user,
     });
 
@@ -106,7 +104,7 @@ const GetSingleQr = async (req, res, next) => {
       return next(new AppErr(error.errors[0].msg, 403));
     }
 
-    let Qr = await GoogleMapModel.findOne({ _id: req.params.id });
+    let Qr = await TextModel.findOne({ _id: req.params.id });
     if (!Qr) {
       return next(new AppErr("No Qr found", 404));
     }
@@ -129,7 +127,6 @@ const UpdateQrData = async (req, res, next) => {
       return next(new AppErr(error.errors[0].msg, 403));
     }
 
-    let { lat, lon } = req.body;
     //--------------Finding User-------------------------//
     let user = await UserModel.findById(req.user);
     if (!user) {
@@ -137,7 +134,7 @@ const UpdateQrData = async (req, res, next) => {
     }
 
     //--------------Finding Qr---------------------------//
-    let getQr = await GoogleMapModel.findOne({ UniqueId: req.body.UniqueId });
+    let getQr = await TextModel.findOne({ UniqueId: req.body.UniqueId });
     if (!getQr) {
       return next(new AppErr("Qr not found", 404));
     }
@@ -147,13 +144,17 @@ const UpdateQrData = async (req, res, next) => {
       return next(new AppErr("You Dont't have access to edit this qr", 405));
     }
 
-    let updatedata = await GoogleMapModel.findByIdAndUpdate(
+    //-----------Delete previous data------------------------//
+    // const result = await cloudinary.uploader.destroy(getQr.PublicId);
+    // if (result.result === "not found") {
+    //   return next(new AppErr("Public Id Incorrect", 404));
+    // }
+
+    let updatedata = await TextModel.findByIdAndUpdate(
       getQr,
       {
-        lat,
-        lon,
-        Url: `https://www.google.com/maps?q=${lat},${lon}&z=17&hl=en`,
-        QrName: req.body.qrName,
+        Url: req.body.Url,
+        QrName: req.body.QrName,
       },
       {
         new: true,
@@ -180,14 +181,20 @@ const DeleteQr = async (req, res, next) => {
 
     //------------------------Finding User----------------------//
     let user = await UserModel.findById(req.user);
-    let Qr = await GoogleMapModel.findById(req.params.id);
-    console.log(Qr);
+    let Qr = await TextModel.findById(req.params.id);
     if (user._id != Qr.UserId) {
       return next(
         new AppErr("You dont have permission to Delete this Qr", 404)
       );
     }
-    await GoogleMapModel.findByIdAndDelete(req.params.id);
+
+    //-----------Delete previous data------------------------//
+    // const result = await cloudinary.uploader.destroy(Qr.PublicId);
+    // if (result.result === "not found") {
+    //   return next(new AppErr("Public Id Incorrect", 404));
+    // }
+
+    await TextModel.findByIdAndDelete(req.params.id);
     const indexToRemove = user.Qr.findIndex((item) => item._id === Qr._id);
     if (indexToRemove !== -1) {
       user.Qr.splice(indexToRemove, 1);
@@ -217,7 +224,7 @@ const updateQrImgaes = async (req, res, next) => {
     }
 
     //--------------Finding Qr---------------------------//
-    let getQr = await GoogleMapModel.findOne({ UniqueId: req.body.UniqueId });
+    let getQr = await TextModel.findOne({ UniqueId: req.body.UniqueId });
     if (!getQr) {
       return next(new AppErr("Qr not found", 404));
     }
@@ -237,7 +244,7 @@ const updateQrImgaes = async (req, res, next) => {
 
     const timestamp = new Date().getTime(); // Current timestamp
     const randomPart = Math.floor(Math.random() * 10000); // Random number (adjust as needed)
-    let url = `https://qr-backend-ten.vercel.app/api/v1/Scan/Scanqr/Map/${timestamp}${randomPart}`;
+    let url = `https://qr-backend-ten.vercel.app/api/v1/Scan/Scanqr/Text/${timestamp}${randomPart}`;
 
     let qr = GenerateCustomizeQr(
       url,
@@ -248,7 +255,7 @@ const updateQrImgaes = async (req, res, next) => {
       image
     );
     qr.then(async (qr) => {
-      let newimages = await GoogleMapModel.findByIdAndUpdate(
+      let newimages = await TextModel.findByIdAndUpdate(
         getQr._id,
         {
           QrImage: qr,

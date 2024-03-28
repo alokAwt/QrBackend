@@ -5,6 +5,10 @@ const AudioQrSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    QrName: {
+      type: String,
+      required: true,
+    },
     QrImage: {
       type: String,
       required: true,
@@ -21,6 +25,10 @@ const AudioQrSchema = new mongoose.Schema(
     Qrtype: {
       type: String,
       default: "Audio",
+    },
+    PublicId: {
+      type: String,
+     
     },
   },
   {

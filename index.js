@@ -1,6 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
+var Fingerprint = require("express-fingerprint");
+const cloudinary = require("cloudinary").v2;
 const Db = require("./Config/DbConnection");
 const UserRouter = require("./Route/User");
 const globalErrHandler = require("./Middleware/GlobalError");
@@ -15,8 +17,10 @@ const VideoRouter = require("./Route/QR/Video");
 const GooglemapRouter = require("./Route/QR/GoogleMap");
 const SuscriptionRouter = require("./Route/Subscription");
 const SuscriptionPlanRouter = require("./Route/SubscriptionPlan");
-const requestIp = require('request-ip');
+const requestIp = require("request-ip");
 const ContactRouter = require("./Route/ContactUs");
+const GameRouter = require("./Route/Gamification");
+const TextRouter = require("./Route/QR/Text");
 const app = express();
 Db();
 require("dotenv").config();
@@ -26,6 +30,14 @@ app.use(express.json());
 app.use(cors());
 app.use(morgan("dev"));
 app.use(requestIp.mw());
+app.use(
+  Fingerprint({ parameters: [Fingerprint.useragent, Fingerprint.geoip] })
+);
+cloudinary.config({
+  cloud_name: "dxlmwq61j",
+  api_key: "449172957755657",
+  api_secret: "_svozk1NVYoC0NWVSoV-fhR-j5c",
+});
 
 //------------------Routes MiddleWare---------------------//
 app.use("/api/v1/Users", UserRouter);
@@ -38,9 +50,12 @@ app.use("/api/v1/audioQr", AudioRouter);
 app.use("/api/v1/ImageQr", ImageRouter);
 app.use("/api/v1/VideoQr", VideoRouter);
 app.use("/api/v1/Map", GooglemapRouter);
-app.use("/api/v1/Suscription",SuscriptionRouter)
-app.use("/api/v1/Plan",SuscriptionPlanRouter);
-app.use("/api/v1/contact",ContactRouter);
+app.use("/api/v1/Suscription", SuscriptionRouter);
+app.use("/api/v1/Plan", SuscriptionPlanRouter);
+app.use("/api/v1/contact", ContactRouter);
+app.use("/api/v1/Gamification", GameRouter);
+app.use("/api/v1/Text", TextRouter);
+
 app.use(globalErrHandler);
 
 //----------------Server Listening--------------------------//

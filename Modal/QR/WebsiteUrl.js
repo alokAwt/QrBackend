@@ -5,6 +5,10 @@ const WebsiteQrSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    QrName:{
+      type: String,
+      required: true,
+    },
     QrImage: {
       type: String,
     },

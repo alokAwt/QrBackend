@@ -68,7 +68,7 @@ const SendEmail = async (email, otp) => {
 
   return new Promise((resolve, reject) => {
     const transporter = nodemailer.createTransport({
-      service: 'Gmail',
+      service: "Gmail",
       auth: {
         user: "easypeasy11746@gmail.com",
         pass: "eyqunwdhrpkbzvwg",
@@ -80,12 +80,11 @@ const SendEmail = async (email, otp) => {
         console.error(error);
         reject(error); // Reject the Promise in case of an error
       } else {
-        console.log('Email sent: ' + info.response);
+        console.log("Email sent: " + info.response);
         resolve(info); // Resolve the Promise with the result in case of success
       }
     });
   });
-
 };
 
 module.exports = SendEmail;

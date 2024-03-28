@@ -15,6 +15,7 @@ const VideoModel = require("../Modal/QR/Video");
 const PlayStoreModel = require("../Modal/QR/PlayStore");
 const ScanModel = require("../Modal/Scanqr");
 const SubcriptionModel = require("../Modal/Subscription");
+var jwt = require("jsonwebtoken");
 
 //-----------------------SignUp User------------------------//
 
@@ -294,7 +295,7 @@ const getOwnProfile = async (req, res, next) => {
       fetchPromises.push(
         modelName
           .find({ _id: { $in: user.Qr } })
-          .select("Url UniqueId Qrtype QrImage")
+          .select("Url UniqueId Qrtype QrImage QrName")
           .lean()
       );
     });
@@ -846,6 +847,80 @@ const UpdateQrDataByadmin = async (req, res, next) => {
   }
 };
 
+//-----------------------Check Email and Number--------------------//
+const UserCheck = async (req, res, next) => {
+  try {
+    let { email, number } = req.body;
+
+    let user = await UserModel.findOne({ Email: email });
+    if (user) {
+      return next(new AppErr("Email already have account", 404));
+    }
+    let user2 = await UserModel.findOne({ ContactNumber: number });
+    if (user2) {
+      return next(new AppErr("Number already have account", 404));
+    }
+
+    return res.status(200).json({
+      status: "success",
+      data: true,
+    });
+  } catch (error) {
+    return next(new AppErr(error.message, 500));
+  }
+};
+
+//----------------------Login With Google-------------------------//
+
+const LoginWithGoogle = async (req, res, next) => {
+  try {
+    const token = req.headers.token;
+
+    if (!token) {
+      return res.status(401).json({
+        status: "error",
+        message: "No token provided",
+      });
+    }
+
+    const decodedToken = jwt.decode(token);
+
+    if (!decodedToken) {
+      return res.status(401).json({
+        status: "error",
+        message: "Invalid token",
+      });
+    }
+
+    const { name, email } = decodedToken;
+    const randomPart = Math.floor(Math.random() * 1000);
+    let user = await UserModel.findOne({ Email: email });
+    if (!user) {
+      req.body.Email = email;
+      req.body.Name = name;
+      req.body.isUser = true;
+      req.body.ContactNumber = randomPart;
+
+      let newUser = await UserModel.create(req.body);
+
+      let userToken = GenerateToken(newUser._id);
+
+      return res.status(200).json({
+        status: "success",
+        token: userToken,
+      });
+    }
+
+    return res.status(200).json({
+      status: "success",
+      token: GenerateToken(user._id),
+    });
+  } catch (error) {
+    console.error("Error in LoginWithGoogle:", error);
+    return next(new AppErr(error.message, 500));
+  }
+};
+
 module.exports = {
   SignUpuserCtrl,
   SigninCtrl,
@@ -866,4 +941,6 @@ module.exports = {
   AllQrdata,
   UpdateProfilebyAdmin,
   UpdateQrDataByadmin,
+  UserCheck,
+  LoginWithGoogle,
 };

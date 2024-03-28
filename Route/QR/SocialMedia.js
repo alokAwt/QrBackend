@@ -5,6 +5,7 @@ const {
   GetSingleQr,
   DeleteQr,
   UpdateQrData,
+  updateQrImgaes,
 } = require("../../Controllers/QR/SocialMedia");
 const IsLogin = require("../../Middleware/Islogin");
 const Isblocked = require("../../Middleware/IsBlocked");
@@ -17,7 +18,7 @@ SocialMediaRouter.route("/SocialMediaurl/Create").post(
   body("Url").notEmpty().withMessage("Website Url is required"),
   IsLogin,
   Isblocked,
-  Issubcription,
+  // Issubcription,
   CreateQr
 );
 
@@ -43,6 +44,12 @@ SocialMediaRouter.route("/SocialMediaurl/update").put(
   IsLogin,
   Isblocked,
   UpdateQrData
+);
+
+SocialMediaRouter.route("/SocialMediaurl/update/Images").put(
+  IsLogin,
+  Isblocked,
+ updateQrImgaes
 );
 
 module.exports = SocialMediaRouter;

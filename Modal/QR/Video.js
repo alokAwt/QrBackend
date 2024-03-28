@@ -5,6 +5,10 @@ const VideoQrSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    QrName: {
+      type: String,
+      required: true,
+    },
     QrImage: {
       type: String,
       required: true,
@@ -21,6 +25,9 @@ const VideoQrSchema = new mongoose.Schema(
     Qrtype: {
       type: String,
       default: "Video",
+    },
+    PublicId: {
+      type: String,
     },
   },
   {
