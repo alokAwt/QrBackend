@@ -11,13 +11,14 @@ const AudioModel = require("../Modal/QR/Audio");
 const UserModel = require("../Modal/User");
 const ScanModel = require("../Modal/Scanqr");
 const axios = require("axios");
+const TextModel = require("../Modal/QR/Text");
 
 const ScanQr = async (req, res, next) => {
   try {
     //------------------Validation Error-------------------------//
     let error = validationResult(req);
     if (!error.isEmpty()) {
-      return next(new AppErr(err.errors[0].msg, 403));
+      return next(new AppErr(error.errors[0].msg, 403));
     }
 
     //---   get req.query unique id along with type
@@ -83,6 +84,14 @@ const ScanQr = async (req, res, next) => {
         }
         break;
       }
+      case "Text": {
+        let newqr = await TextModel.findOne({ UniqueId: id });
+        if (!qr) {
+          return next(new AppErr("Qr details not found", 500));
+        }
+        return res.send(newqr.Url);
+        break;
+      }
       default: {
         return next(new AppErr("Wrong Qr Scaned", 500));
       }
@@ -133,7 +142,7 @@ const getAnalytics = async (req, res, next) => {
     //------------------Validation Error-------------------------//
     let error = validationResult(req);
     if (!error.isEmpty()) {
-      return next(new AppErr(err.errors[0].msg, 403));
+      return next(new AppErr(error.errors[0].msg, 403));
     }
 
     let { startDate, EndDate, UserId, QrId } = req.body;
@@ -277,7 +286,7 @@ const getAnalytics = async (req, res, next) => {
 
     //---------------OS AND DEVICE---------------//
     result.forEach((item) => {
-      const os = item.os_family;
+      const os = item.Os;
 
       if (!OsData[os]) {
         OsData[os] = 0;
@@ -297,7 +306,7 @@ const getAnalytics = async (req, res, next) => {
 
     //------------Browser----------------//
     result.forEach((item) => {
-      const Browser = item.browser_family;
+      const Browser = item.DeviceName;
       if (!BrowserData[Browser]) {
         BrowserData[Browser] = 0;
       }
@@ -355,7 +364,7 @@ const getAnalytics = async (req, res, next) => {
       Browser: BrowserData,
       device: DeviceData,
       map: mapData,
-      citycode: citycode,
+      state: citycode,
     });
 
     return res.status(200).json({

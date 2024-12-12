@@ -6,6 +6,7 @@ const {
   GetSingleQr,
   DeleteQr,
   UpdateQrData,
+  updateQrImgaes,
 } = require("../../Controllers/QR/WebsiteUrl");
 const Issubcription = require("../../Middleware/IsSubcriptionTaken");
 const { body } = require("express-validator");
@@ -16,7 +17,7 @@ WebsiteRouter.route("/Websiteurl/Create").post(
   body("Url").notEmpty().withMessage("Website Url is required"),
   IsLogin,
   Isblocked,
-  Issubcription,
+  // Issubcription,
   CreateQr
 );
 
@@ -35,5 +36,11 @@ WebsiteRouter.route("/Websiteurl/DeleteQr/:id").delete(
 );
 
 WebsiteRouter.route("/Websiteurl/update").put(IsLogin, Isblocked, UpdateQrData);
+
+WebsiteRouter.route("/Websiteurl/update/Images").put(
+  IsLogin,
+  Isblocked,
+  updateQrImgaes
+);
 
 module.exports = WebsiteRouter;

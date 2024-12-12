@@ -1,6 +1,7 @@
 const { validationResult } = require("express-validator");
 const AppErr = require("../Global/AppErr");
 const Razorpay = require("razorpay");
+const crypto = require("crypto");
 const UserModel = require("../Modal/User");
 const SubcriptionModel = require("../Modal/Subscription");
 const KEY_ID = "rzp_test_MtraH0q566XjUb";
@@ -23,7 +24,7 @@ const CreateOrder = async (req, res, next) => {
     //--------Creating Order--------------//
     let instance = new Razorpay({ key_id: KEY_ID, key_secret: KEY_SECRET });
     var options = {
-      amount: req.body.Price, // amount in the smallest currency unit
+      amount: req.body.Price * 100, // amount in the smallest currency unit
       currency: "INR",
     };
     instance.orders.create(options, (err, order) => {
@@ -52,7 +53,9 @@ const PayAmount = async (req, res, next) => {
     if (!user) {
       return next(new AppErr("User not Found", 500));
     }
-    if (user.subscription) {
+
+    let days = req.body.days;
+    if (user.subscription.length > 0) {
       var Difference_In_Time =
         new Date().getTime() -
         new Date(user.subscription[0].lastDate).getTime();
@@ -61,22 +64,22 @@ const PayAmount = async (req, res, next) => {
       if (Difference_In_Days >= 0) {
         //--------When subscription is finished---------------//
         let last_date = new Date();
-        last_date.setDate(last_date.getDate() + 30);
+        last_date.setDate(last_date.getDate() + days); //-------------add number of days----//
         req.body.lastDate = last_date;
       } else {
         //--------When subscription is remaining---------------//
         let last_date = new Date(user.subscription[0].lastDate);
-        last_date.setDate(last_date.getDate() + 30);
+        last_date.setDate(last_date.getDate() + days); //-------------add number of days----//
         req.body.lastDate = last_date;
       }
     } else {
       let last_date = new Date();
-      last_date.setDate(last_date.getDate() + 30);
+      last_date.setDate(last_date.getDate() + days); //-------------add number of days----//
       req.body.lastDate = last_date;
     }
 
     //----------Getting User Data------------------//
-    let { response } = req.body;
+    let { response, PlanType } = req.body;
     let body = response.razorpay_order_id + "|" + response.razorpay_payment_id;
 
     //-----------Validating Signatire-----------//
@@ -148,4 +151,9 @@ const getAllSubscriptionsByAdmin = async (req, res, next) => {
   }
 };
 
-module.exports = { CreateOrder, PayAmount, getAllSubscriptions,getAllSubscriptionsByAdmin };
+module.exports = {
+  CreateOrder,
+  PayAmount,
+  getAllSubscriptions,
+  getAllSubscriptionsByAdmin,
+};

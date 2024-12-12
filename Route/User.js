@@ -12,6 +12,16 @@ const {
   UpdateProfile,
   CreateAccountByAdwin,
   DeleteAccountbyAdwn,
+  UnblockUser,
+  getAllBlocked,
+  getAllUser,
+  GetAllQr,
+  TotalEarining,
+  AllQrdata,
+  UpdateProfilebyAdmin,
+  UpdateQrDataByadmin,
+  UserCheck,
+  LoginWithGoogle,
 } = require("../Controllers/User");
 const { body, param } = require("express-validator");
 const IsLogin = require("../Middleware/Islogin");
@@ -102,5 +112,31 @@ UserRouter.route("/deleteAccountByAdwin/:id").put(
   IsAdwin,
   DeleteAccountbyAdwn
 );
+
+UserRouter.route("/Unblock/:id").put(
+  param("id").notEmpty().withMessage("Params id is required"),
+  IsLogin,
+  IsAdwin,
+  UnblockUser
+);
+
+UserRouter.route("/blockUser").get(IsLogin, IsAdwin, getAllBlocked);
+
+UserRouter.route("/User").get(IsLogin, IsAdwin, getAllUser);
+
+UserRouter.route("/Dashboard").get(IsLogin, IsAdwin, GetAllQr);
+
+UserRouter.route("/Earning").get(IsLogin, IsAdwin, TotalEarining);
+UserRouter.route("/AllQrData").get(IsLogin, IsAdwin, AllQrdata);
+UserRouter.route("/UpdateUser/admin").put(
+  IsLogin,
+  IsAdwin,
+  UpdateProfilebyAdmin
+);
+UserRouter.route("/UpdateQr/admin").put(IsLogin, IsAdwin, UpdateQrDataByadmin);
+
+UserRouter.route("/CheckUser").post(UserCheck);
+
+UserRouter.route("/Login/Google").post(LoginWithGoogle);
 
 module.exports = UserRouter;

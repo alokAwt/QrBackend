@@ -4,6 +4,7 @@ const UserModel = require("../../Modal/User");
 const ScanModel = require("../../Modal/Scanqr");
 const ImageModel = require("../../Modal/QR/Image");
 const GenerateCustomizeQr = require("../../Global/CustomixedQr");
+const cloudinary = require("cloudinary").v2;
 
 //------------------------------CreateQr------------------------------------//
 const CreateQr = async (req, res, next) => {
@@ -11,7 +12,7 @@ const CreateQr = async (req, res, next) => {
     //------------------Validation Error-------------------------//
     let error = validationResult(req);
     if (!error.isEmpty()) {
-      return next(new AppErr(err.errors[0].msg, 403));
+      return next(new AppErr(error.errors[0].msg, 403));
     }
 
     //---------Getting UserDetails-----------------//
@@ -29,6 +30,7 @@ const CreateQr = async (req, res, next) => {
       cornersOptions,
       cornersDotOptions,
       image,
+      QrName,
     } = req.body;
 
     //---  Generate Unique ID
@@ -69,9 +71,6 @@ const CreateQr = async (req, res, next) => {
   }
 };
 
-
-
-
 //------------------------GETALLQR--------------------------------//
 
 const Getallqr = async (req, res) => {
@@ -79,7 +78,7 @@ const Getallqr = async (req, res) => {
     //------------------Validation Error-------------------------//
     let error = validationResult(req);
     if (!error.isEmpty()) {
-      return next(new AppErr(err.errors[0].msg, 403));
+      return next(new AppErr(error.errors[0].msg, 403));
     }
 
     let Qr = await ImageModel.find({
@@ -102,7 +101,7 @@ const GetSingleQr = async (req, res, next) => {
     //------------------Validation Error-------------------------//
     let error = validationResult(req);
     if (!error.isEmpty()) {
-      return next(new AppErr(err.errors[0].msg, 403));
+      return next(new AppErr(error.errors[0].msg, 403));
     }
 
     let Qr = await ImageModel.findOne({ _id: req.params.id });
@@ -125,7 +124,7 @@ const UpdateQrData = async (req, res, next) => {
     //------------------Validation Error-------------------------//
     let error = validationResult(req);
     if (!error.isEmpty()) {
-      return next(new AppErr(err.errors[0].msg, 403));
+      return next(new AppErr(error.errors[0].msg, 403));
     }
 
     //--------------Finding User-------------------------//
@@ -145,15 +144,24 @@ const UpdateQrData = async (req, res, next) => {
       return next(new AppErr("You Dont't have access to edit this qr", 405));
     }
 
+    //-----------Delete previous data------------------------//
+    const result = await cloudinary.uploader.destroy(getQr.PublicId);
+    if (result.result === "not found") {
+      return next(new AppErr("Public Id Incorrect", 404));
+    }
+
     let updatedata = await ImageModel.findByIdAndUpdate(
       getQr,
       {
         Url: req.body.Url,
+        QrName: req.body.qrName,
+        PublicId: req.body.PublicId,
       },
       {
         new: true,
       }
     );
+    console.log(updatedata);
 
     return res.status(200).json({
       message: "success",
@@ -170,7 +178,7 @@ const DeleteQr = async (req, res, next) => {
     //------------------Validation Error-------------------------//
     let error = validationResult(req);
     if (!error.isEmpty()) {
-      return next(new AppErr(err.errors[0].msg, 403));
+      return next(new AppErr(error.errors[0].msg, 403));
     }
 
     //------------------------Finding User----------------------//
@@ -181,13 +189,90 @@ const DeleteQr = async (req, res, next) => {
         new AppErr("You dont have permission to Delete this Qr", 404)
       );
     }
+    console.log(Qr);
+    //-----------Delete previous data------------------------//
+    // const result = await cloudinary.uploader.destroy('Assets/o3n17vospnwrh4sbsepa');
+    // console.log(result);
+    // if (result.result === "not found") {
+    //   return next(new AppErr("Public Id Incorrect", 404));
+    // }
+
     await ImageModel.findByIdAndDelete(req.params.id);
-    user.Qr.pop(Qr._id);
+    const indexToRemove = user.Qr.findIndex((item) => item._id === Qr._id);
+    if (indexToRemove !== -1) {
+      user.Qr.splice(indexToRemove, 1);
+    }
     await user.save();
 
     return res.status(200).json({
       message: "Success",
       data: "Deleted successfully",
+    });
+  } catch (error) {
+    return next(new AppErr(error.message, 500));
+  }
+};
+
+const updateQrImgaes = async (req, res, next) => {
+  try {
+    let error = validationResult(req);
+    if (!error.isEmpty()) {
+      return next(new AppErr(error.errors[0].msg, 403));
+    }
+
+    //--------------Users------------------------------//
+    let user = await UserModel.findById(req.user);
+    if (!user) {
+      return next(new AppErr("User not found", 404));
+    }
+
+    //--------------Finding Qr---------------------------//
+    let getQr = await ImageModel.findOne({ UniqueId: req.body.UniqueId });
+    if (!getQr) {
+      return next(new AppErr("Qr not found", 404));
+    }
+
+    //------------Checking----------------------//
+    if (user._id != getQr.UserId) {
+      return next(new AppErr("You Dont't have access to edit this qr", 405));
+    }
+
+    let {
+      dotoption,
+      backgroundOption,
+      cornersOptions,
+      cornersDotOptions,
+      image,
+    } = req.body;
+
+    const timestamp = new Date().getTime(); // Current timestamp
+    const randomPart = Math.floor(Math.random() * 10000); // Random number (adjust as needed)
+    let url = `https://qr-backend-ten.vercel.app/api/v1/Scan/Scanqr/Image/${timestamp}${randomPart}`;
+
+    let qr = GenerateCustomizeQr(
+      url,
+      dotoption,
+      backgroundOption,
+      cornersOptions,
+      cornersDotOptions,
+      image
+    );
+    qr.then(async (qr) => {
+      let newimages = await ImageModel.findByIdAndUpdate(
+        getQr._id,
+        {
+          QrImage: qr,
+          UniqueId: `${timestamp}${randomPart}`,
+        },
+        { new: true }
+      );
+
+      return res.status(200).json({
+        status: "success",
+        data: newimages,
+      });
+    }).catch((err) => {
+      return next(new AppErr(err, 500));
     });
   } catch (error) {
     return next(new AppErr(error.message, 500));
@@ -200,4 +285,5 @@ module.exports = {
   GetSingleQr,
   DeleteQr,
   UpdateQrData,
+  updateQrImgaes,
 };

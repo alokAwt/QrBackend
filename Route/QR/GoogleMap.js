@@ -6,6 +6,7 @@ const {
   GetSingleQr,
   DeleteQr,
   UpdateQrData,
+  updateQrImgaes,
 } = require("../../Controllers/QR/GoogleMap");
 const Issubcription = require("../../Middleware/IsSubcriptionTaken");
 const { body } = require("express-validator");
@@ -17,7 +18,7 @@ GooglemapRouter.route("/Googlemap/Create").post(
   body("lon").notEmpty().withMessage("Longitude is required"),
   IsLogin,
   Isblocked,
-  Issubcription,
+  // Issubcription,
   CreateQr
 );
 
@@ -36,5 +37,7 @@ GooglemapRouter.route("/Googlemap/DeleteQr/:id").delete(
 );
 
 GooglemapRouter.route("/Googlemap/update").put(IsLogin, Isblocked, UpdateQrData);
+
+GooglemapRouter.route("/Googlemap/update/Images").put(IsLogin, Isblocked, updateQrImgaes);
 
 module.exports = GooglemapRouter;

@@ -13,11 +13,14 @@
   "dependencies": {
     "@loskir/styled-qr-code-node": "^1.5.1",
     "axios": "^1.6.5",
+    "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
+    "cloudinary": "^2.0.3",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
+    "express-fingerprint": "^1.2.2",
     "express-validator": "^7.0.1",
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
@@ -26,6 +29,7 @@
     "nanoid": "^5.0.4",
     "nodemailer": "^6.9.7",
     "otp-generator": "^4.0.1",
+    "qrcode": "^1.5.3",
     "razorpay": "^2.9.2",
     "request-ip": "^3.3.0"
   }
